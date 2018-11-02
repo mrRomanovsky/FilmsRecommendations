@@ -112,6 +112,7 @@
             this.recommendationsButton.TabIndex = 8;
             this.recommendationsButton.Text = "Получить рекомендации";
             this.recommendationsButton.UseVisualStyleBackColor = true;
+            this.recommendationsButton.Click += new System.EventHandler(this.recommendationsButton_Click);
             // 
             // Form1
             // 
