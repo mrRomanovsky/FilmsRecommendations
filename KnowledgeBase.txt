@@ -1,0 +1,20 @@
+Constant : ACTOR_BRAD_PITT | ACTOR_EDWARD_NORTON | ACTOR_DI_CAPRIO | ACTOR_JOHNNY_DEPP | ACTOR_TOM_CRUISE | ACTOR_DANILA_KOZLOVSKY | ACTOR_HEATH_LEDGER
+         | FILM_TOP_GUN | FILM_TITANIC | FILM_FIGHT_CLUB | FILM_AMERICAN_HISTORY_X | FILM_BROKEBACK_MOUNTAIN
+         | GENRE_DRAMA | GENRE_ACTION | GENRE_HORROR | GENRE_WAR | GENRE_HISTORICAL | GENRE_WESTERN
+         | COUNTRY_USA | COUNTRY_RUSSIA | COUNTRY_FRANCE | COUNTRY_SPAIN @
+Variable : x | y | c | g @
+Predicate : HasOscar | HasActor | HasGenre | HasCountry | IsBad | IsCommon | IsGood | IsAwesome @
+Axioms : (Vx.HasActor(x,ACTOR_EDWARD_NORTON) <> IsAwesome(x))
+       | (Vx.HasActor(x,ACTOR_DI_CAPRIO)<>IsGood(x))
+       | (Vx.HasActor(x,ACTOR_BRAD_PITT)<>IsGood(x))
+       | (Vx.HasActor(x,ACTOR_DI_CAPRIO)<>IsCommon(x))
+       | (Vx.HasActor(x,ACTOR_TOM_CRUISE)<>IsCommon(x))
+       | (Vx.HasActor(x,ACTOR_HEATH_LEDGER)<>IsGood(x))
+       | (Vx.HasActor(x,ACTOR_DANILA_KOZLOVSKY)<>IsBad(x))
+       | (Vx.HasCountry(x,COUNTRY_USA)<>IsGood(x))
+       | (Vx.HasCountry(x,COUNTRY_RUSSIA)<>IsBad(x))
+       | (Vx.HasGenre(x,GENRE_ACTION)<>IsAwesome(x))
+       | (Vx.HasGenre(x,GENRE_WESTERN)<>IsGood(x))
+       | (Vx.HasGenre(x,GENRE_DRAMA)<>IsCommon(x))
+       | (Vx.HasGenre(x,GENRE_HORROR)<>IsCommon(x))
+       | (Vx.Ey.HasOscar(x,y)<>IsGood(x)) @
