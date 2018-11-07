@@ -25,6 +25,10 @@ namespace FilmsRecommendations
         private void recommendationsButton_Click(object sender, EventArgs e)
         {
             //var flm = new FilmKnowledgeBase(pathToKB);
+            var kb = new FilmKnowledgeBase("");
+            kb.AddSentence(kb.ParseSentence("HasActor(THE_GREAT_GATSBY,DI_CAPRIO)"));
+            kb.AddSentence(kb.ParseSentence("HasActor(INCEPTION,DI_CAPRIO)"));
+            kb.AddSentence(kb.ParseSentence("Vy.(Vx.((HasOscar(x))^(HasActor(y,x))->(IsAwesome(x))"));
             //FilmKnowledgeBase.ParseSentence(knowledgeBase, "HasActor(FILM_TOP_GUN,ACTOR_EDWARD_NORTON");
             //FilmKnowledgeBase.ParseSentence(knowledgeBase, "(Vx.HasActor(x,ACTOR_EDWARD_NORTON)<>IsAwesome(x))");
             //FilmKnowledgeBase.ParseSentence(knowledgeBase, "HasActor(FILM_TITANIC,ACTOR_BRAD_PITT");

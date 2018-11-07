@@ -20,6 +20,7 @@ namespace FilmsRecommendations
         public FilmKnowledgeBase(string pathToKB)
         {
             this.pathToKB = pathToKB;
+            Sentences = new List<ISentence>();
         }
 
         public List<ISentence> Sentences { get; set; } 
