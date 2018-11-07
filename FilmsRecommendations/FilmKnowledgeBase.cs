@@ -51,7 +51,7 @@ namespace FilmsRecommendations
             int closingBracketIdx = sentence.LastIndexOf(')');
             quantifiedSentence.Variable = sentence[1].ToString();
             int innerSentenceStart = openBracketIdx + 1;
-            quantifiedSentence.Sentence = ParseSentence(sentence.Substring(innerSentenceStart, closingBracketIdx - innerSentenceStart - 1));
+            quantifiedSentence.Sentence = ParseSentence(sentence.Substring(innerSentenceStart, closingBracketIdx - innerSentenceStart));
             return quantifiedSentence;
         }
 
@@ -75,9 +75,10 @@ namespace FilmsRecommendations
             }
 
             sentenceConnSentence.Sentence1 = ParseSentence(sentence.Substring(1, currPos - 1 - 1));
-            sentenceConnSentence.Connective = sentence[currPos].ToString();
+            int connectiveEndIdx = sentence.IndexOf('(', currPos);
+            sentenceConnSentence.Connective = sentence.Substring(currPos, connectiveEndIdx - currPos);//sentence[currPos].ToString();
             sentenceConnSentence.Sentence2 =
-                ParseSentence(sentence.Substring(currPos + 2, sentence.Length - (currPos + 2) - 1));
+                ParseSentence(sentence.Substring(connectiveEndIdx + 1, sentence.Length - (connectiveEndIdx + 1) - 1));
             return sentenceConnSentence;
         }
 
@@ -91,7 +92,7 @@ namespace FilmsRecommendations
 
             var argsStartIdx = openBracketIdx + 1;
             pred.PredicateName = sentence.Substring(0, openBracketIdx);
-            foreach (var argument in sentence.Substring(argsStartIdx, closingBracketIdx - argsStartIdx - 1).Split(','))
+            foreach (var argument in sentence.Substring(argsStartIdx, closingBracketIdx - argsStartIdx).Split(','))
                 pred.Terms.Add(new Term(argument));
 
 
@@ -249,7 +250,10 @@ namespace FilmsRecommendations
         public static void FindAndInfer(FilmKnowledgeBase kb, List<ISentence> premises, ISentence conclusion, Substitution s)
         {
             if (premises.Count == 0)
+            {
                 ForwardChain(kb, conclusion.Substitute(s));
+                return;
+            }
             foreach (var kbSentence in kb.Sentences)
             {
                 var unifyResult = Unify(kbSentence, premises.First().Substitute(s));
@@ -328,6 +332,12 @@ namespace FilmsRecommendations
 
     public class Substitution
     {
+        public Substitution()
+        {
+            SubsitutionDict = new Dictionary<string, string>();
+            Successful = false;
+        }
+
         public Dictionary<string, string> SubsitutionDict { get; set; }
 
         public bool Successful { get; set; }

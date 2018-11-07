@@ -50,7 +50,9 @@ namespace FilmsRecommendations
                 conjuncts.AddRange(GetConjunctions(connectiveSentence.Sentence2));
                 return conjuncts;
             }
-            return new List<ISentence>();
+            var res = new List<ISentence>();
+            res.Add(sentence);
+            return res;
         }
 
 
