@@ -15,244 +15,353 @@ namespace FilmsRecommendations
 
     public class FilmKnowledgeBase
     {
+        private string pathToKB;
 
-        public FilmKnowledgeBase parent;
-        public List<FilmKnowledgeBase> next;
-        public Tuple<Type, string> data;
-
-        public static SortedDictionary<string, List<string>> store;
-        public FilmKnowledgeBase(Type type, string sentence)
+        public FilmKnowledgeBase(string pathToKB)
         {
-            parent = null;
-            data = new Tuple<Type, string>(type, sentence);
-            next = new List<FilmKnowledgeBase>();
+            this.pathToKB = pathToKB;
         }
 
-        public FilmKnowledgeBase(string pathToKnowledgeBase, Type type, string sentence)
-        {
-            store = new SortedDictionary<string, List<string>>();
-            var text = System.IO.File.ReadAllText(pathToKnowledgeBase)
-                .Replace("\r\n", String.Empty)
-                .Split('@')
-                .Reverse()
-                .Skip(1) //To remove last empty line
-                .Reverse()
-                .ToList();
-            foreach (var item in text)
-            {
-                var keyValue = item.Split(':').ToList();
-                store[keyValue.First().Replace(" ", String.Empty)] = keyValue
-                                                                             .Last()
-                                                                             .Split('|')
-                                                                             .Select(x => x.Replace(" ", String.Empty))
-                                                                             .ToList();
-            }
+        public List<ISentence> Sentences { get; set; } 
 
-            parent = null;
-            data = new Tuple<Type, string>(type, sentence);
-            next = new List<FilmKnowledgeBase>();
+        public ISentence ParseSentence(string sentence)
+        {
+            if (sentence[0] == 'V' || sentence[0] == 'E')
+                return ParseQuantifiedSentence(sentence);
+            if (sentence[0] == '(')
+                return ParseSentenceConnectiveSentence(sentence);
+            return ParsePredicate(sentence);
         }
 
-        public FilmKnowledgeBase(string pathToKnowledgeBase)
+        public void AddSentence(ISentence sentence)
         {
-            store = new SortedDictionary<string, List<string>>();
-            var text = System.IO.File.ReadAllText(pathToKnowledgeBase)
-                .Replace("\r\n", String.Empty)
-                .Split('@')
-                .Reverse()
-                .Skip(1) //To remove last empty line
-                .Reverse()
-                .ToList();
-            foreach (var item in text)
-            {
-                var keyValue = item.Split(':').ToList();
-                store[keyValue.First().Replace(" ", String.Empty)] = keyValue
-                                                                             .Last()
-                                                                             .Split('|')
-                                                                             .Select(x => x.Replace(" ", String.Empty))
-                                                                             .ToList();
-            }
-
-            parent = null;
-            data = new Tuple<Type, string>(Type.None, "");
-            next = new List<FilmKnowledgeBase>();
+            Sentences.Add(sentence);
         }
 
-        private static List<char> quantifier = new List<char> {'V', 'E' };
-        private static List<char> connective = new List<char> { '-', '/', '\\', '<'};
-        private static List<Type> terminal = new List<Type> { Type.Variable, Type.Constant, Type.Connective, Type.Quantifier, Type.Predicate};
-
-        private static bool isAtomicSentence(string str)
+        #region parsingSentences
+        private ISentence ParseQuantifiedSentence(string sentence)
         {
-            var atomicSent = true;
-            foreach (var item in connective)
+            var quantifiedSentence = new QuantifierVariableSentence();
+            if (sentence[0] == 'V')
+                quantifiedSentence.Quantifier = Quantifier.All;
+            else
+                quantifiedSentence.Quantifier = Quantifier.Exists;
+            int openBracketIdx = 3;
+            int closingBracketIdx = sentence.LastIndexOf(')');
+            quantifiedSentence.Variable = sentence[1].ToString();
+            int innerSentenceStart = openBracketIdx + 1;
+            quantifiedSentence.Sentence = ParseSentence(sentence.Substring(innerSentenceStart, closingBracketIdx - innerSentenceStart - 1));
+            return quantifiedSentence;
+        }
+
+        private SentenceConnectiveSentence ParseSentenceConnectiveSentence(string sentence)
+        {
+            if (sentence[0] != '(')
+                throw new Exception("Trying to parse SentenceConnectiveSentence: '(' expected!");
+            var sentenceConnSentence = new SentenceConnectiveSentence();
+            int openBracketsCount = 1;
+            int closingBracketsCount = 0;
+            int currPos = 1;
+            while (true)
             {
-                if (str.Contains(item) || str.Contains('.'))
-                {
-                    atomicSent = false;
+                if (sentence[currPos] == '(')
+                    ++openBracketsCount;
+                else if (sentence[currPos] == ')')
+                    ++closingBracketsCount;
+                ++currPos;
+                if (openBracketsCount == closingBracketsCount)
                     break;
-                }
             }
-            return atomicSent;
+
+            sentenceConnSentence.Sentence1 = ParseSentence(sentence.Substring(1, currPos - 1 - 1));
+            sentenceConnSentence.Connective = sentence[currPos].ToString();
+            sentenceConnSentence.Sentence2 =
+                ParseSentence(sentence.Substring(currPos + 2, sentence.Length - (currPos + 2) - 1));
+            return sentenceConnSentence;
         }
 
-        public static void ParseSentence(FilmKnowledgeBase KB, string strToParse)
+        private Predicate ParsePredicate(string sentence)
         {
-            if (terminal.Contains(KB.data.Item1))
-                return;
-            if(KB.parent == null)
-                KB.data = new Tuple<Type, string>(Type.Sentence, strToParse);
-            //Parse Quantifier, plz use one symbol variables (maybe fix it later)
-            if (quantifier.Contains(strToParse[0]))
-            {
-                var dotInd = strToParse.IndexOf('.');
-                if (dotInd == -1)
-                {
-                    var nodeQuant = new FilmKnowledgeBase(Type.Quantifier, strToParse.Substring(0, 1));
-                    nodeQuant.parent = KB;
-                    KB.next.Add(nodeQuant);
-                    var nodeVar = new FilmKnowledgeBase(Type.Variable, strToParse.Substring(1));
-                    nodeVar.parent = KB;
-                    KB.next.Add(nodeVar);
-                    ParseSentence(nodeVar, strToParse.Substring(1));
-                    ParseSentence(nodeQuant, strToParse.Substring(0, 1));
-                }
-                else
-                {
-                    var node1 = new FilmKnowledgeBase(Type.QuantVar, strToParse.Substring(0, dotInd));
-                    node1.parent = KB;
-                    KB.next.Add(node1);
-                    FilmKnowledgeBase node2;
+            var pred = new Predicate();
+            int openBracketIdx = sentence.IndexOf('(');
+            int closingBracketIdx = openBracketIdx + 1;
+            while (sentence[closingBracketIdx] != ')')
+                ++closingBracketIdx;
 
-                    if (isAtomicSentence(strToParse))
+            var argsStartIdx = openBracketIdx + 1;
+            pred.PredicateName = sentence.Substring(0, openBracketIdx);
+            foreach (var argument in sentence.Substring(argsStartIdx, closingBracketIdx - argsStartIdx - 1).Split(','))
+                pred.Terms.Add(new Term(argument));
+
+
+            return pred;
+        }
+        #endregion
+
+        #region Unify
+        private static Substitution PredicateUnify(Predicate pred1, Predicate pred2)
+        {
+            var res = new Substitution();
+            res.Successful = false;
+            
+            if (pred1.PredicateName != pred2.PredicateName)
+                return res;
+
+            for (int i = 0; i < pred1.Terms.Count; i++)
+            {
+                var t1 = pred1.Terms[i];
+                var t2 = pred2.Terms[i];
+                if (t1.IsConstant && t2.IsConstant)
+                {
+                    if (t1.Value != t2.Value)
+                        return res;
+                    else
+                        continue;
+                }
+
+                if (t1.IsConstant && !t2.IsConstant)
+                {
+                    //на самом деле надо идти по словарю по предкам до первой встреченной консстанты или пустоты
+                    if (!res.SubsitutionDict.ContainsKey(t2.Value))
                     {
-                        node2 = new FilmKnowledgeBase(Type.Sentence, strToParse.Substring(dotInd + 1));
-                        node2.parent = KB;
-                        KB.next.Add(node2);
-                        ParseSentence(node2, strToParse.Substring(dotInd + 1));
+                        res.SubsitutionDict.Add(t2.Value, t1.Value);
+                        continue;
+                    }
+                    else
+                        return res;
+                }
+
+                if (!t1.IsConstant)
+                {
+                    if (t2.IsConstant)
+                    {
+                        if (!res.SubsitutionDict.ContainsKey(t1.Value))
+                        {
+                            res.SubsitutionDict.Add(t1.Value, t2.Value);
+                            continue;
+                        }
+                        else
+                            return res;
                     }
                     else
                     {
-                        node2 = new FilmKnowledgeBase(Type.AtomicSent, strToParse.Substring(dotInd + 1));
-                        node2.parent = KB;
-                        KB.next.Add(node2);
-                        ParseSentence(node2, strToParse.Substring(dotInd + 1));
-                    }
-                    ParseSentence(node1, strToParse.Substring(0, dotInd));
-                }
-            }
-
-            //Parse Predicate
-            else if (KB.data.Item1 == Type.AtomicSent)
-            {
-                foreach (var item in store["Predicate"])
-                {
-                    var predInd = strToParse.IndexOf(item);
-                    if (predInd == 0)
-                    {
-                        var node1 = new FilmKnowledgeBase(Type.Predicate, strToParse.Substring(0, item.Length));
-                        node1.parent = KB;
-                        KB.next.Add(node1);
-                        var node2 = new FilmKnowledgeBase(Type.Arg, strToParse.Substring(item.Length));
-                        node2.parent = KB;
-                        KB.next.Add(node2);
-                        ParseSentence(node1, strToParse.Substring(0, item.Length));
-                        ParseSentence(node2, strToParse.Substring(item.Length));
-                        break;
-                    }
-                }
-            }
-
-            //Parse Arg
-            else if(KB.data.Item1 == Type.Arg)
-            {
-                strToParse = strToParse.Replace(" ", String.Empty);
-                var args = strToParse.Substring(1, strToParse.Length - 2).Split(',');
-                foreach (var item in args)
-                {
-                    if (store["Constant"].Contains(item))
-                    {
-                        var node1 = new FilmKnowledgeBase(Type.Constant, item);
-                        node1.parent = KB;
-                        KB.next.Add(node1);
-                        ParseSentence(node1, item);
-                    }
-                    else if(store["Variable"].Contains(item)){
-                        var node1 = new FilmKnowledgeBase(Type.Variable, item);
-                        node1.parent = KB;
-                        KB.next.Add(node1);
-                        ParseSentence(node1, item);
-                    }
-                }
-            }
-
-            //Parse Sentence Connective Sentence
-            else if (strToParse[0] == '(')
-            {
-                strToParse = strToParse.Substring(1, strToParse.Length - 2);
-                var bracketsCount = 0;
-                var i = 0;
-                var flag = true;
-                while(i != strToParse.Length - 1 && flag)
-                {
-                    if(strToParse[i] == ')' || strToParse[i] == '(')
-                    {
-                        bracketsCount++;
-                        i++;
-                        continue;
-                    }
-                    if (bracketsCount % 2 == 0)
-                    {
-                        foreach (var item in connective)
+                        if (!res.SubsitutionDict.ContainsKey(t1.Value))
                         {
-                            if (strToParse[i] == item)
-                            {
-                                flag = false;
-                                var str = strToParse.Substring(0, i);
-
-                                if (isAtomicSentence(str))
-                                {
-                                    var node1 = new FilmKnowledgeBase(Type.AtomicSent, str);
-                                    node1.parent = KB;
-                                    KB.next.Add(node1);
-                                    ParseSentence(node1, str);
-                                }
-                                else
-                                {
-                                    var node1 = new FilmKnowledgeBase(Type.Sentence, str);
-                                    node1.parent = KB;
-                                    KB.next.Add(node1);
-                                    ParseSentence(node1, str);
-                                }
-
-                                var node2 = new FilmKnowledgeBase(Type.Connective, strToParse.Substring(i, 2));
-                                node2.parent = KB;
-                                KB.next.Add(node2);
-                                ParseSentence(node2, strToParse.Substring(i, 2));
-
-                                str = strToParse.Substring(i + 2);
-                                if (isAtomicSentence(str))
-                                {
-                                    var node3 = new FilmKnowledgeBase(Type.AtomicSent, str);
-                                    node3.parent = KB;
-                                    KB.next.Add(node3);
-                                    ParseSentence(node3, str);
-                                }
-                                else
-                                {
-                                    var node3 = new FilmKnowledgeBase(Type.Sentence, str);
-                                    node3.parent = KB;
-                                    KB.next.Add(node3);
-                                    ParseSentence(node3, str);
-                                }
-
-                                break;
-                            }
+                            res.SubsitutionDict.Add(t1.Value, t2.Value);
+                            continue;
+                        }
+                        if (!res.SubsitutionDict.ContainsKey(t2.Value))
+                        {
+                            res.SubsitutionDict.Add(t2.Value, t1.Value);
+                            continue;
                         }
                     }
-                    i++;
+                    //if (char.IsUpper(res.SubsitutionDict[t1.Value][0]))
+                    //        //if (t2.Value != res.SubsitutionDict[t1.Value])
+                    //        //    return res;
+                    //        //else
+                    return res;
+                }
+            }
+            res.Successful = true;
+            return res;
+        }
+
+        public static Substitution Unify(ISentence sentence1, ISentence sentence2)
+        {
+            var res = new Substitution();
+            res.Successful = false;
+            switch (sentence1.GetSentenceType())
+            {
+                case SentenceType.Predicate:
+                    if (sentence2.GetSentenceType() == SentenceType.QuantifierVariableSentence)
+                    {
+                        var qvs2 = sentence2 as QuantifierVariableSentence;
+                        if (qvs2.Quantifier != Quantifier.Exists)
+                            break;
+                        return Unify(sentence1, qvs2.Sentence);
+                    }
+                    if (sentence2.GetSentenceType() == SentenceType.SentenceConnectiveSentence)
+                        break;
+                    var pred1 = sentence1 as Predicate;
+                    var pred2 = sentence2 as Predicate;
+                    return PredicateUnify(pred1, pred2);
+
+                case SentenceType.SentenceConnectiveSentence:
+                    if (sentence1.GetSentenceType() != sentence2.GetSentenceType())
+                        break;
+                    var scs1 = sentence1 as SentenceConnectiveSentence;
+                    var scs2 = sentence1 as SentenceConnectiveSentence;
+                    if (scs1.Connective != scs2.Connective)
+                        break;
+                    return Unify(scs1.Sentence1, scs2.Sentence1).Compose(Unify(scs1.Sentence2, scs2.Sentence2));
+
+                case SentenceType.QuantifierVariableSentence:
+                    var qvs1 = sentence1 as QuantifierVariableSentence;
+                    if (qvs1.Quantifier == Quantifier.Exists)
+                        return Unify(qvs1.Sentence, sentence2);
+                    if (sentence2.GetSentenceType() == SentenceType.QuantifierVariableSentence)
+                    {
+                        var qvs2 = sentence2 as QuantifierVariableSentence;
+                        if (qvs1.Quantifier == qvs2.Quantifier)
+                            return Unify(qvs1.Sentence, qvs2.Sentence);
+                        break;
+                    }
+                    break;
+
+                default:
+                    return res;
+            }
+            return res;
+        }
+        #endregion
+
+
+        #region ForwardChain
+        public static void ForwardChain(FilmKnowledgeBase kb, ISentence sentence)
+        {
+            foreach (var kbSentence in kb.Sentences)
+                if (IsRenaiming(kbSentence, sentence))
+                    return;
+            kb.Sentences.Add(sentence);
+            foreach (var kbSentence in kb.Sentences)
+            {
+                var innerSentence = DropOuterQuantifiers(kbSentence);
+                if (innerSentence.GetSentenceType() == SentenceType.SentenceConnectiveSentence)
+                {
+                    var sentenceConnectiveSentence = innerSentence as SentenceConnectiveSentence;
+                    if (sentenceConnectiveSentence.Connective == "->")
+                    {
+                        var anticedents = SentenceConnectiveSentence.GetAnticedents(sentenceConnectiveSentence);
+                        for (int i = 0; i < anticedents.Count; ++i)
+                        {
+                            var unificationResult = Unify(anticedents[i], sentence);
+                            if (unificationResult.Successful)
+                                FindAndInfer(kb, anticedents.Take(i).Concat(anticedents.Skip(i + 1)).ToList(), //dropping unified sentence
+                                    sentenceConnectiveSentence.Sentence2, unificationResult);
+                        }
+                    }
                 }
             }
         }
+
+        public static void FindAndInfer(FilmKnowledgeBase kb, List<ISentence> premises, ISentence conclusion, Substitution s)
+        {
+            if (premises.Count == 0)
+                ForwardChain(kb, conclusion.Substitute(s));
+            foreach (var kbSentence in kb.Sentences)
+            {
+                var unifyResult = Unify(kbSentence, premises.First().Substitute(s));
+                if (unifyResult.Successful)
+                {
+                    FindAndInfer(kb, premises.Skip(1).ToList(), conclusion, s.Compose(unifyResult));
+                }
+            }
+        }
+
+        public static ISentence DropOuterQuantifiers(ISentence sentence)
+        {
+            switch (sentence.GetSentenceType())
+            {
+                case SentenceType.Predicate:
+                    return sentence;
+                case SentenceType.SentenceConnectiveSentence:
+                    return sentence;
+                default: //QuantifierVariableSentence
+                    var quantifiedSentence = sentence as QuantifierVariableSentence;
+                    if (quantifiedSentence.Quantifier == Quantifier.All)
+                        return DropOuterQuantifiers(quantifiedSentence.Sentence);
+                    else
+                        return sentence;
+            }
+        }
+
+        public static bool IsRenaiming(ISentence sentence1, ISentence sentence2)
+        {
+            var unification = Unify(sentence1, sentence2);
+            if (!unification.Successful)
+                return false;
+            foreach (var val in unification.SubsitutionDict.Values)
+                if (Char.IsUpper(val[0]))
+                    return false;
+            return true;
+        }
+        #endregion
+
+        #region BackwardChain
+        public Substitution BackwardChain(ISentence sentence)
+        {
+            var q = new Queue<ISentence>();
+            q.Enqueue(sentence);
+            return BackChainList(q, new Substitution());
+        }
+
+        private Substitution BackChainList(Queue<ISentence> sentences, Substitution substitution)
+        {
+            Substitution answer = new Substitution();
+            if (sentences.Count == 0)
+                return substitution;
+            var q = sentences.Dequeue();
+            foreach (var sen in Sentences)
+            {
+                var sub = Unify(q, sen);
+                if (sub.Successful)
+                    substitution.Compose(sub);
+            }
+            foreach (var sen in Sentences
+                .Select(s => DropOuterQuantifiers(s))
+                .Where(s => s.GetSentenceType() == SentenceType.SentenceConnectiveSentence && (s as SentenceConnectiveSentence).Connective == "->")
+                .Select(s => s as SentenceConnectiveSentence))
+            {
+                var sub2 = Unify(q, sen.Sentence2);
+                if (sub2.Successful)
+                {
+                    var qq = new Queue<ISentence>( SentenceConnectiveSentence.GetAnticedents(sen));
+                    answer.Compose(BackChainList(new Queue<ISentence>(qq.Select(x => x.Substitute(sub2))), substitution.Compose(sub2)));
+                }
+            }
+            return answer.Compose(BackChainList(sentences, substitution));
+        }
+        #endregion
     }
+
+    public class Substitution
+    {
+        public Dictionary<string, string> SubsitutionDict { get; set; }
+
+        public bool Successful { get; set; }
+
+        public Substitution Compose(Substitution other)
+        {
+            var substitutionComposed = new Substitution();
+            foreach (var dictElem in SubsitutionDict)
+                substitutionComposed.SubsitutionDict[dictElem.Key] = dictElem.Value;
+
+            if (!Successful || !other.Successful)
+            {
+                substitutionComposed.Successful = false;
+                return substitutionComposed;
+            }
+
+            foreach (var otherDictElem in other.SubsitutionDict)
+            {
+                if (SubsitutionDict.ContainsKey(otherDictElem.Key))
+                {
+                    var thisValue = SubsitutionDict[otherDictElem.Key];
+                    if (Char.IsUpper(thisValue[0]) && otherDictElem.Value != thisValue)
+                    {
+                        substitutionComposed.Successful = false;
+                        return substitutionComposed;
+                    }
+                    substitutionComposed.SubsitutionDict[otherDictElem.Key] = otherDictElem.Value;
+                }
+                else
+                    substitutionComposed.SubsitutionDict[otherDictElem.Key] = otherDictElem.Value;
+            }
+
+            substitutionComposed.Successful = true;
+            return substitutionComposed;
+        }
+    }
+
 }
