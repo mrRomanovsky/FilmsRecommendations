@@ -26,7 +26,27 @@ namespace FilmsRecommendations
 
         private void buttonAddParametrs_Click(object sender, EventArgs e)
         {
-
+            if (listBoxAnswerType.SelectedItem == null)
+            {
+                //распознать 
+                // s = knowledgeBase.ParseSentence(knowledgeBase, textBoxAnwerAsString.Text);
+                //if (sentence == null)
+                //{
+                //    sentence = s;
+                //}
+                //else
+                //    sentence = new SentenceConnectiveSentence(sentence, s, "^");
+            }
+            else
+            {
+                var s = ReadSentenceFromPanel();
+                if (sentence == null)
+                {
+                    sentence = s;
+                }
+                else
+                    sentence = new SentenceConnectiveSentence(sentence, s, "^");
+            }
         }
 
         private void buttonGetAnswer_Click(object sender, EventArgs e)

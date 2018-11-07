@@ -24,7 +24,6 @@ namespace FilmsRecommendations
 
         private void recommendationsButton_Click(object sender, EventArgs e)
         {
-            //var flm = new FilmKnowledgeBase(pathToKB);
             var kb = new FilmKnowledgeBase("");
             kb.AddSentence(kb.ParseSentence("HasActor(THE_GREAT_GATSBY,DI_CAPRIO)"));
             kb.AddSentence(kb.ParseSentence("HasActor(INCEPTION,DI_CAPRIO)"));

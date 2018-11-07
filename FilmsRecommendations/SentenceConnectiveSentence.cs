@@ -55,7 +55,10 @@ namespace FilmsRecommendations
             return res;
         }
 
-
+        public override string ToString()
+        {
+            return Sentence1.ToString() + Connective + Sentence2.ToString();
+        }
         public string Connective { get; set; }
 
         public ISentence Sentence1 { get; set; }

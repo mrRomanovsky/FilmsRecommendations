@@ -38,6 +38,11 @@ namespace FilmsRecommendations
             return newPredicate;
         }
 
+        public override string ToString()
+        {
+            return PredicateName + "(" + Terms.Select(t => t.Value + ",") + ")";
+        }
+
         public string PredicateName { get; set; }
 
         public List<Term> Terms { get; set; }

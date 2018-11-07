@@ -20,7 +20,7 @@ namespace FilmsRecommendations
         public FilmKnowledgeBase(string pathToKB)
         {
             this.pathToKB = pathToKB;
-            Sentences = new List<ISentence>();
+            Sentences = new List<ISentence>(); 
         }
 
         public List<ISentence> Sentences { get; set; } 
@@ -101,6 +101,7 @@ namespace FilmsRecommendations
         #endregion
 
         #region Unify
+
         private static Substitution PredicateUnify(Predicate pred1, Predicate pred2)
         {
             var res = new Substitution();
@@ -132,7 +133,6 @@ namespace FilmsRecommendations
                     else
                         return res;
                 }
-
                 if (!t1.IsConstant)
                 {
                     if (t2.IsConstant)
@@ -209,6 +209,7 @@ namespace FilmsRecommendations
                             return Unify(qvs1.Sentence, qvs2.Sentence);
                         break;
                     }
+
                     break;
 
                 default:
@@ -216,8 +217,7 @@ namespace FilmsRecommendations
             }
             return res;
         }
-        #endregion
-
+        #endregion 
 
         #region ForwardChain
         public static void ForwardChain(FilmKnowledgeBase kb, ISentence sentence)
@@ -255,7 +255,7 @@ namespace FilmsRecommendations
                 return;
             }
             foreach (var kbSentence in kb.Sentences)
-            {
+            { 
                 var unifyResult = Unify(kbSentence, premises.First().Substitute(s));
                 if (unifyResult.Successful)
                 {

@@ -36,6 +36,12 @@ namespace FilmsRecommendations
             return quantifierVariableSentenceSubst;
         }
 
+        override public string ToString()
+        {
+            var q = Quantifier == Quantifier.All ? "V" : "E";
+            return q + Variable + "." + Sentence.ToString();
+        }
+
         public Quantifier Quantifier { get; set; }
         public string Variable { get; set; }
         public ISentence Sentence { get; set; }

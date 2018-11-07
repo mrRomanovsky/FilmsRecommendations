@@ -185,6 +185,7 @@
             this.textBoxAnwerAsString.Size = new System.Drawing.Size(498, 20);
             this.textBoxAnwerAsString.TabIndex = 15;
             this.textBoxAnwerAsString.Text = "Vx.(HasActor(x, ACTOR_EDWARD_NORTON)=>IsAwesome(x))";
+            this.textBoxAnwerAsString.Text = "Vx.(HasActor(x, ACTOR_EDWARD_NORTON)->IsAwesome(x))";
             // 
             // buttonClear
             // 
