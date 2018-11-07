@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.genreLabel = new System.Windows.Forms.Label();
             this.countryLabel = new System.Windows.Forms.Label();
             this.actorsLabel = new System.Windows.Forms.Label();
@@ -37,6 +38,7 @@
             this.actorsTextBox = new System.Windows.Forms.TextBox();
             this.recommendationsTextBox = new System.Windows.Forms.TextBox();
             this.recommendationsButton = new System.Windows.Forms.Button();
+            this.printPreviewDialog1 = new System.Windows.Forms.PrintPreviewDialog();
             this.SuspendLayout();
             // 
             // genreLabel
@@ -114,6 +116,16 @@
             this.recommendationsButton.UseVisualStyleBackColor = true;
             this.recommendationsButton.Click += new System.EventHandler(this.recommendationsButton_Click);
             // 
+            // printPreviewDialog1
+            // 
+            this.printPreviewDialog1.AutoScrollMargin = new System.Drawing.Size(0, 0);
+            this.printPreviewDialog1.AutoScrollMinSize = new System.Drawing.Size(0, 0);
+            this.printPreviewDialog1.ClientSize = new System.Drawing.Size(400, 300);
+            this.printPreviewDialog1.Enabled = true;
+            this.printPreviewDialog1.Icon = ((System.Drawing.Icon)(resources.GetObject("printPreviewDialog1.Icon")));
+            this.printPreviewDialog1.Name = "printPreviewDialog1";
+            this.printPreviewDialog1.Visible = false;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -129,7 +141,7 @@
             this.Controls.Add(this.countryLabel);
             this.Controls.Add(this.genreLabel);
             this.Name = "Form1";
-            this.Text = "Form1";
+            this.Text = "Прямой поиск";
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -146,6 +158,7 @@
         private System.Windows.Forms.TextBox actorsTextBox;
         private System.Windows.Forms.TextBox recommendationsTextBox;
         private System.Windows.Forms.Button recommendationsButton;
+        private System.Windows.Forms.PrintPreviewDialog printPreviewDialog1;
     }
 }
 
