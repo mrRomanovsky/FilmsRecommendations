@@ -20,7 +20,9 @@ namespace FilmsRecommendations
         public FilmKnowledgeBase(string pathToKB)
         {
             this.pathToKB = pathToKB;
-            Sentences = new List<ISentence>(); 
+            Sentences = new List<ISentence>();
+            foreach (var sent in System.IO.File.ReadAllLines(pathToKB))
+                AddSentence(ParseSentence(sent));
         }
 
         public List<ISentence> Sentences { get; set; } 
@@ -248,6 +250,19 @@ namespace FilmsRecommendations
                 }
                 ++sentIdx;
             }
+        }
+
+        public List<string> GetFilmsForUser()
+        {
+            var filmsForUser = new List<string>();
+            foreach (var sentence in Sentences)
+                if (sentence.GetSentenceType() == SentenceType.Predicate)
+                {
+                    var pred = sentence as Predicate;
+                    if (pred.PredicateName == "UserLikesFilm")
+                        filmsForUser.Add(pred.Terms[0].Value);
+                }
+            return filmsForUser;
         }
 
         public static void FindAndInfer(FilmKnowledgeBase kb, List<ISentence> premises, ISentence conclusion, Substitution s)

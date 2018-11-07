@@ -39,6 +39,8 @@
             this.recommendationsTextBox = new System.Windows.Forms.TextBox();
             this.recommendationsButton = new System.Windows.Forms.Button();
             this.printPreviewDialog1 = new System.Windows.Forms.PrintPreviewDialog();
+            this.label1 = new System.Windows.Forms.Label();
+            this.qualityTextBox = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // genreLabel
@@ -62,7 +64,7 @@
             // actorsLabel
             // 
             this.actorsLabel.AutoSize = true;
-            this.actorsLabel.Location = new System.Drawing.Point(12, 265);
+            this.actorsLabel.Location = new System.Drawing.Point(13, 245);
             this.actorsLabel.Name = "actorsLabel";
             this.actorsLabel.Size = new System.Drawing.Size(45, 13);
             this.actorsLabel.TabIndex = 2;
@@ -93,7 +95,7 @@
             // 
             // actorsTextBox
             // 
-            this.actorsTextBox.Location = new System.Drawing.Point(106, 262);
+            this.actorsTextBox.Location = new System.Drawing.Point(106, 245);
             this.actorsTextBox.Name = "actorsTextBox";
             this.actorsTextBox.Size = new System.Drawing.Size(100, 20);
             this.actorsTextBox.TabIndex = 6;
@@ -126,11 +128,29 @@
             this.printPreviewDialog1.Name = "printPreviewDialog1";
             this.printPreviewDialog1.Visible = false;
             // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(13, 334);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(54, 13);
+            this.label1.TabIndex = 9;
+            this.label1.Text = "Качество";
+            // 
+            // qualityTextBox
+            // 
+            this.qualityTextBox.Location = new System.Drawing.Point(106, 327);
+            this.qualityTextBox.Name = "qualityTextBox";
+            this.qualityTextBox.Size = new System.Drawing.Size(100, 20);
+            this.qualityTextBox.TabIndex = 10;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.qualityTextBox);
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.recommendationsButton);
             this.Controls.Add(this.recommendationsTextBox);
             this.Controls.Add(this.actorsTextBox);
@@ -159,6 +179,8 @@
         private System.Windows.Forms.TextBox recommendationsTextBox;
         private System.Windows.Forms.Button recommendationsButton;
         private System.Windows.Forms.PrintPreviewDialog printPreviewDialog1;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.TextBox qualityTextBox;
     }
 }
 
