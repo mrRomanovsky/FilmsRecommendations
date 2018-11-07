@@ -20,7 +20,9 @@ namespace FilmsRecommendations
         public FilmKnowledgeBase(string pathToKB)
         {
             this.pathToKB = pathToKB;
-            Sentences = new List<ISentence>(); 
+            Sentences = new List<ISentence>();
+            foreach (var sent in System.IO.File.ReadAllLines(pathToKB))
+                AddSentence(ParseSentence(sent));
         }
 
         public List<ISentence> Sentences { get; set; } 
@@ -304,14 +306,21 @@ namespace FilmsRecommendations
         private Substitution BackChainList(Queue<ISentence> sentences, Substitution substitution)
         {
             Substitution answer = new Substitution();
+            answer.Successful = true;
             if (sentences.Count == 0)
+            {
+               // substitution.Successful = true;
                 return substitution;
+            }
             var q = sentences.Dequeue();
             foreach (var sen in Sentences)
             {
                 var sub = Unify(q, sen);
                 if (sub.Successful)
+                {
+                    substitution.Successful = true;
                     substitution.Compose(sub);
+                }
             }
             foreach (var sen in Sentences
                 .Select(s => DropOuterQuantifiers(s))
@@ -332,6 +341,12 @@ namespace FilmsRecommendations
 
     public class Substitution
     {
+        public Substitution(bool s)
+        {
+            SubsitutionDict = new Dictionary<string, string>();
+            Successful = s;
+        }
+
         public Substitution()
         {
             SubsitutionDict = new Dictionary<string, string>();

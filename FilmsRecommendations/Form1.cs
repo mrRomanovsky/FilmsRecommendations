@@ -24,11 +24,11 @@ namespace FilmsRecommendations
 
         private void recommendationsButton_Click(object sender, EventArgs e)
         {
-            var kb = new FilmKnowledgeBase("");
-            kb.AddSentence(kb.ParseSentence("HasActor(THE_GREAT_GATSBY,DI_CAPRIO)"));
-            kb.AddSentence(kb.ParseSentence("HasActor(INCEPTION,DI_CAPRIO)"));
-            kb.AddSentence(kb.ParseSentence("Vy.(Vx.(((HasOscar(x))^(HasActor(y,x)))->(IsAwesome(x))))"));
-            FilmKnowledgeBase.ForwardChain(kb, kb.ParseSentence("HasOscar(DI_CAPRIO)"));
+          //  var kb = new FilmKnowledgeBase("");
+            //kb.AddSentence(kb.ParseSentence("HasActor(THE_GREAT_GATSBY,DI_CAPRIO)"));
+            //kb.AddSentence(kb.ParseSentence("HasActor(INCEPTION,DI_CAPRIO)"));
+            //kb.AddSentence(kb.ParseSentence("Vy.(Vx.(((HasOscar(x))^(HasActor(y,x)))->(IsAwesome(x))))"));
+            //FilmKnowledgeBase.ForwardChain(kb, kb.ParseSentence("HasOscar(DI_CAPRIO)"));
         }
     }
 }

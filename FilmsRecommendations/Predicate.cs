@@ -40,7 +40,7 @@ namespace FilmsRecommendations
 
         public override string ToString()
         {
-            return PredicateName + "(" + Terms.Select(t => t.Value + ",") + ")";
+            return PredicateName + "(" + string.Join(",", Terms.Select(t => t.Value)) + ")";
         }
 
         public string PredicateName { get; set; }

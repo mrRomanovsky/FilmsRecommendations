@@ -19,17 +19,18 @@ namespace FilmsRecommendations
         {
             InitializeComponent();
             pathToKB = pathToKBTextBox.Text;
-            knowledgeBase = new FilmKnowledgeBase(pathToKB);
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
+            knowledgeBase = new FilmKnowledgeBase(pathToKBTextBox.Text);
             var f = new Form1(knowledgeBase);
             f.ShowDialog();
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
+            knowledgeBase = new FilmKnowledgeBase(pathToKBTextBox.Text);
             var f = new Form2(knowledgeBase);
             f.ShowDialog();
         }
