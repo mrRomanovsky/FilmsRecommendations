@@ -24,13 +24,27 @@ namespace FilmsRecommendations
 
         private void recommendationsButton_Click(object sender, EventArgs e)
         {
-            //var flm = new FilmKnowledgeBase(pathToKB);
-            //FilmKnowledgeBase.ParseSentence(knowledgeBase, "HasActor(FILM_TOP_GUN,ACTOR_EDWARD_NORTON");
-            //FilmKnowledgeBase.ParseSentence(knowledgeBase, "(Vx.HasActor(x,ACTOR_EDWARD_NORTON)<>IsAwesome(x))");
-            //FilmKnowledgeBase.ParseSentence(knowledgeBase, "HasActor(FILM_TITANIC,ACTOR_BRAD_PITT");
-            //FilmKnowledgeBase.ParseSentence(flm, "(Vx.HasActor(x, ACTOR_BRAD_PITT) <> IsGood(x))");
-            Console.WriteLine(knowledgeBase); //Console doesn't work, just for breakpoint :D
-            //C:\Users\Andrew\intellectual_systems\FilmsRecommendations\KnowledgeBase.txt
+            var genre = genreTextBox.Text;
+            var quality = qualityTextBox.Text;
+            var actors = actorsTextBox.Text.Split(';');
+            //var kb = new FilmKnowledgeBase("");
+            var userSentences = new List<ISentence>();
+            userSentences.Add(knowledgeBase.ParseSentence("UserLikesGenre("+ genre + ")"));
+            userSentences.Add(knowledgeBase.ParseSentence("UserLikesQuality(" + quality + ")"));
+            foreach (var actor in actors)
+                userSentences.Add(knowledgeBase.ParseSentence("UserLikesActor(" + actor + ")"));
+
+            for (int i = 1; i < userSentences.Count; ++i)
+                knowledgeBase.AddSentence(userSentences[i]);
+
+            knowledgeBase.AddSentence(knowledgeBase.ParseSentence("HasActor(THE_GREAT_GATSBY,DI_CAPRIO)"));
+            knowledgeBase.AddSentence(knowledgeBase.ParseSentence("HasActor(INCEPTION,DI_CAPRIO)"));
+            knowledgeBase.AddSentence(knowledgeBase.ParseSentence("Vy.(Vx.(((HasOscar(x))^(HasActor(y,x)))->(IsAwesome(y))))"));
+            FilmKnowledgeBase.ForwardChain(knowledgeBase, userSentences[0]);
+
+            foreach (var filmForUser in knowledgeBase.GetFilmsForUser())
+                recommendationsTextBox.Text += filmForUser + "\n";
+            //FilmKnowledgeBase.ForwardChain(kb, kb.ParseSentence("HasOscar(DI_CAPRIO)"));
         }
     }
 }

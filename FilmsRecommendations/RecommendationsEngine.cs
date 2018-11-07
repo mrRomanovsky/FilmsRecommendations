@@ -10,7 +10,7 @@ namespace FilmsRecommendations
     {
         public FilmRecommendationsEngine(string pathToKnowledgeBase)
         {
-            knowledgeBase = new FilmKnowledgeBase(pathToKnowledgeBase);
+            //knowledgeBase = new FilmKnowledgeBase(pathToKnowledgeBase);
         }
 
         public FilmRecommendationsEngine(FilmKnowledgeBase knowledgeBase)
