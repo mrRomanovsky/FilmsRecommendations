@@ -27,7 +27,7 @@ namespace FilmsRecommendations
             var kb = new FilmKnowledgeBase("");
             kb.AddSentence(kb.ParseSentence("HasActor(THE_GREAT_GATSBY,DI_CAPRIO)"));
             kb.AddSentence(kb.ParseSentence("HasActor(INCEPTION,DI_CAPRIO)"));
-            kb.AddSentence(kb.ParseSentence("Vy.(Vx.(((HasOscar(x))^(HasActor(y,x)))->(IsAwesome(x))))"));
+            kb.AddSentence(kb.ParseSentence("Vy.(Vx.(((HasOscar(x))^(HasActor(y,x)))->(IsAwesome(y))))"));
             FilmKnowledgeBase.ForwardChain(kb, kb.ParseSentence("HasOscar(DI_CAPRIO)"));
         }
     }
