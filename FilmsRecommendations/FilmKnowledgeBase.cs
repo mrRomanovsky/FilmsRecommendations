@@ -228,8 +228,10 @@ namespace FilmsRecommendations
                 if (IsRenaiming(kbSentence, sentence))
                     return;
             kb.Sentences.Add(sentence);
-            foreach (var kbSentence in kb.Sentences)
+            int sentIdx = 0;
+            while (sentIdx < kb.Sentences.Count)
             {
+                var kbSentence = kb.Sentences[sentIdx];
                 var innerSentence = DropOuterQuantifiers(kbSentence);
                 if (innerSentence.GetSentenceType() == SentenceType.SentenceConnectiveSentence)
                 {
@@ -246,6 +248,7 @@ namespace FilmsRecommendations
                         }
                     }
                 }
+                ++sentIdx;
             }
         }
 
@@ -256,13 +259,16 @@ namespace FilmsRecommendations
                 ForwardChain(kb, conclusion.Substitute(s));
                 return;
             }
-            foreach (var kbSentence in kb.Sentences)
-            { 
+            int sentIdx = 0;
+            while (sentIdx < kb.Sentences.Count)
+            {
+                var kbSentence = kb.Sentences[sentIdx];
                 var unifyResult = Unify(kbSentence, premises.First().Substitute(s));
                 if (unifyResult.Successful)
                 {
                     FindAndInfer(kb, premises.Skip(1).ToList(), conclusion, s.Compose(unifyResult));
                 }
+                ++sentIdx;
             }
         }
 
