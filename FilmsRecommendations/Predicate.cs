@@ -52,6 +52,8 @@ namespace FilmsRecommendations
     {
         public Term(string val)
         {
+            if (val == "")
+                Console.WriteLine("I'm here with empty value!");
             Value = val;
         }
 

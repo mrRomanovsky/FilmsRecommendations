@@ -252,6 +252,19 @@ namespace FilmsRecommendations
             }
         }
 
+        public List<string> GetFilmsForUser()
+        {
+            var filmsForUser = new List<string>();
+            foreach (var sentence in Sentences)
+                if (sentence.GetSentenceType() == SentenceType.Predicate)
+                {
+                    var pred = sentence as Predicate;
+                    if (pred.PredicateName == "UserLikesFilm")
+                        filmsForUser.Add(pred.Terms[0].Value);
+                }
+            return filmsForUser;
+        }
+
         public static void FindAndInfer(FilmKnowledgeBase kb, List<ISentence> premises, ISentence conclusion, Substitution s)
         {
             if (premises.Count == 0)
