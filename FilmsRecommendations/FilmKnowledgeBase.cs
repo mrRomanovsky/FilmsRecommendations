@@ -204,13 +204,13 @@ namespace FilmsRecommendations
                     var qvs1 = sentence1 as QuantifierVariableSentence;
                     if (qvs1.Quantifier == Quantifier.Exists)
                         return Unify(qvs1.Sentence, sentence2);
-                    if (sentence2.GetSentenceType() == SentenceType.QuantifierVariableSentence)
+                    /*if (sentence2.GetSentenceType() == SentenceType.QuantifierVariableSentence)
                     {
                         var qvs2 = sentence2 as QuantifierVariableSentence;
                         if (qvs1.Quantifier == qvs2.Quantifier)
                             return Unify(qvs1.Sentence, qvs2.Sentence);
                         break;
-                    }
+                    }*/
 
                     break;
 
@@ -319,6 +319,13 @@ namespace FilmsRecommendations
                 return substitution;
             }
             var q = sentences.Dequeue();
+            while (q.GetSentenceType() == SentenceType.SentenceConnectiveSentence && (q as SentenceConnectiveSentence).Connective == "^")
+            {
+                sentences.Enqueue((q as SentenceConnectiveSentence).Sentence1);
+                sentences.Enqueue((q as SentenceConnectiveSentence).Sentence2);
+                q = sentences.Dequeue();
+            }
+
             foreach (var sen in Sentences)
             {
                 var sub = Unify(q, sen);
