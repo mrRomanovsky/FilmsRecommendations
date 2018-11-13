@@ -29,13 +29,13 @@ namespace FilmsRecommendations
             if (listBoxAnswerType.SelectedItem == null)
             {
                 //распознать 
-                // s = knowledgeBase.ParseSentence(knowledgeBase, textBoxAnwerAsString.Text);
-                //if (sentence == null)
-                //{
-                //    sentence = s;
-                //}
-                //else
-                //    sentence = new SentenceConnectiveSentence(sentence, s, "^");
+                var s = knowledgeBase.ParseSentence(textBoxAnwerAsString.Text);
+                if (sentence == null)
+                {
+                    sentence = s;
+                }
+                else
+                    sentence = new SentenceConnectiveSentence(sentence, s, "^");
             }
             else
             {
@@ -54,7 +54,7 @@ namespace FilmsRecommendations
             if (listBoxAnswerType.SelectedItem == null)
             {
                 //распознать 
-               // sentence = knowledgeBase.ParseSentence(knowledgeBase, textBoxAnwerAsString.Text);
+               sentence = knowledgeBase.ParseSentence(textBoxAnwerAsString.Text);
             }
             else
             {
@@ -67,7 +67,8 @@ namespace FilmsRecommendations
                     sentence = new SentenceConnectiveSentence(sentence, s, "^");
             }
             var answer = knowledgeBase.BackwardChain(sentence);
-            var m = MessageBox.Show(sentence.ToString(), answer.Successful ? "True" : "False", MessageBoxButtons.OK);
+            var m = MessageBox.Show(sentence.ToString() + "\n Ответ : " + answer.Successful.ToString(), answer.Successful ? "True" : "False", MessageBoxButtons.OK);
+            sentence = null;
         }
 
         private ISentence ReadSentenceFromPanel()
