@@ -29,10 +29,13 @@ namespace FilmsRecommendations
             var actors = actorsTextBox.Text.Split(';');
             //var kb = new FilmKnowledgeBase("");
             var userSentences = new List<ISentence>();
-            userSentences.Add(knowledgeBase.ParseSentence("UserLikesGenre("+ genre + ")"));
-            userSentences.Add(knowledgeBase.ParseSentence("UserLikesQuality(" + quality + ")"));
+            if (genre != "")
+                userSentences.Add(knowledgeBase.ParseSentence("UserLikesGenre("+ genre + ")"));
+            if (quality != "")
+                userSentences.Add(knowledgeBase.ParseSentence("UserLikesQuality(" + quality + ")"));
             foreach (var actor in actors)
-                userSentences.Add(knowledgeBase.ParseSentence("UserLikesActor(" + actor + ")"));
+                if (actor != "")
+                    userSentences.Add(knowledgeBase.ParseSentence("UserLikesActor(" + actor + ")"));
 
             for (int i = 1; i < userSentences.Count; ++i)
                 knowledgeBase.AddSentence(userSentences[i]);

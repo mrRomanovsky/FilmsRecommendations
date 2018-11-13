@@ -102,10 +102,10 @@
             // 
             // recommendationsTextBox
             // 
-            this.recommendationsTextBox.Location = new System.Drawing.Point(560, 203);
+            this.recommendationsTextBox.Location = new System.Drawing.Point(560, 23);
             this.recommendationsTextBox.Multiline = true;
             this.recommendationsTextBox.Name = "recommendationsTextBox";
-            this.recommendationsTextBox.Size = new System.Drawing.Size(100, 20);
+            this.recommendationsTextBox.Size = new System.Drawing.Size(179, 396);
             this.recommendationsTextBox.TabIndex = 7;
             // 
             // recommendationsButton
