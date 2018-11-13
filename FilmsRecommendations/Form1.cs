@@ -30,23 +30,23 @@ namespace FilmsRecommendations
             //var kb = new FilmKnowledgeBase("");
             var userSentences = new List<ISentence>();
             if (genre != "")
-                userSentences.Add(knowledgeBase.ParseSentence("UserLikesGenre("+ genre + ")"));
+                userSentences.Add(knowledgeBase.ParseSentence("UserLikesGenre("+ genre + ") 1"));
             if (quality != "")
-                userSentences.Add(knowledgeBase.ParseSentence("UserLikesQuality(" + quality + ")"));
+                userSentences.Add(knowledgeBase.ParseSentence("UserLikesQuality(" + quality + ") 1"));
             foreach (var actor in actors)
                 if (actor != "")
-                    userSentences.Add(knowledgeBase.ParseSentence("UserLikesActor(" + actor + ")"));
+                    userSentences.Add(knowledgeBase.ParseSentence("UserLikesActor(" + actor + ") 1"));
 
             for (int i = 1; i < userSentences.Count; ++i)
                 knowledgeBase.AddSentence(userSentences[i]);
 
-            knowledgeBase.AddSentence(knowledgeBase.ParseSentence("HasActor(THE_GREAT_GATSBY,DI_CAPRIO)"));
-            knowledgeBase.AddSentence(knowledgeBase.ParseSentence("HasActor(INCEPTION,DI_CAPRIO)"));
-            knowledgeBase.AddSentence(knowledgeBase.ParseSentence("Vy.(Vx.(((HasOscar(x))^(HasActor(y,x)))->(IsAwesome(y))))"));
+            knowledgeBase.AddSentence(knowledgeBase.ParseSentence("HasActor(THE_GREAT_GATSBY,DI_CAPRIO) 1"));
+            knowledgeBase.AddSentence(knowledgeBase.ParseSentence("HasActor(INCEPTION,DI_CAPRIO) 1"));
+            knowledgeBase.AddSentence(knowledgeBase.ParseSentence("Vy.(Vx.(((HasOscar(x))^(HasActor(y,x)))->(IsAwesome(y)))) 0,9"));
             FilmKnowledgeBase.ForwardChain(knowledgeBase, userSentences[0]);
 
             foreach (var filmForUser in knowledgeBase.GetFilmsForUser())
-                recommendationsTextBox.Text += filmForUser + "\n";
+                recommendationsTextBox.Text += filmForUser + "\r\n";
             //FilmKnowledgeBase.ForwardChain(kb, kb.ParseSentence("HasOscar(DI_CAPRIO)"));
         }
     }
