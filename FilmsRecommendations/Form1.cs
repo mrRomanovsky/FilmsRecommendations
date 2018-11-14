@@ -99,7 +99,7 @@ namespace FilmsRecommendations
 
             FilmKnowledgeBase.ForwardChain(knowledgeBase, userSentences[0]);
 
-            var res = knowledgeBase.GetFilmsForUser();
+            var res = knowledgeBase.GetInfoAboutFilm(filmName);
             answers = res.Item2;
 
             foreach (var filmForUser in res.Item1)
