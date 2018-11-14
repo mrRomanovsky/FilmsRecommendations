@@ -125,13 +125,15 @@
             this.textBoxActor.Name = "textBoxActor";
             this.textBoxActor.Size = new System.Drawing.Size(100, 20);
             this.textBoxActor.TabIndex = 8;
+            this.textBoxActor.Text = "DI_CAPRIO";
             // 
-            // textBoxJanre
+            // textBoxGenre
             // 
             this.textBoxGenre.Location = new System.Drawing.Point(464, 117);
-            this.textBoxGenre.Name = "textBoxJanre";
+            this.textBoxGenre.Name = "textBoxGenre";
             this.textBoxGenre.Size = new System.Drawing.Size(100, 20);
             this.textBoxGenre.TabIndex = 9;
+            this.textBoxGenre.Text = "DRAMA";
             // 
             // textBoxFilm
             // 
@@ -139,6 +141,7 @@
             this.textBoxFilm.Name = "textBoxFilm";
             this.textBoxFilm.Size = new System.Drawing.Size(100, 20);
             this.textBoxFilm.TabIndex = 10;
+            this.textBoxFilm.Text = "TITANIC";
             // 
             // textBoxCountry
             // 
@@ -146,6 +149,7 @@
             this.textBoxCountry.Name = "textBoxCountry";
             this.textBoxCountry.Size = new System.Drawing.Size(100, 20);
             this.textBoxCountry.TabIndex = 11;
+            this.textBoxCountry.Text = "USA";
             // 
             // buttonGetAnswer
             // 
@@ -184,7 +188,7 @@
             this.textBoxAnwerAsString.Name = "textBoxAnwerAsString";
             this.textBoxAnwerAsString.Size = new System.Drawing.Size(498, 20);
             this.textBoxAnwerAsString.TabIndex = 15;
-            this.textBoxAnwerAsString.Text = "Vx.((HasActor(x, ACTOR_EDWARD_NORTON))->(IsAwesome(x)))";
+            this.textBoxAnwerAsString.Text = "((HasOscar(DI_CAPRIO))^(HasActor(TITANIC,DI_CAPRIO)))->(IsAwesome(TITANIC)) 1";
             // 
             // buttonClear
             // 
