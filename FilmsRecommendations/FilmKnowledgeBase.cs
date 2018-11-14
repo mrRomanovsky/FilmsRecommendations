@@ -219,13 +219,13 @@ namespace FilmsRecommendations
                     var qvs1 = sentence1 as QuantifierVariableSentence;
                     if (qvs1.Quantifier == Quantifier.Exists)
                         return Unify(qvs1.Sentence, sentence2);
-                    /*if (sentence2.GetSentenceType() == SentenceType.QuantifierVariableSentence)
+                    if (sentence2.GetSentenceType() == SentenceType.QuantifierVariableSentence)
                     {
                         var qvs2 = sentence2 as QuantifierVariableSentence;
                         if (qvs1.Quantifier == qvs2.Quantifier)
                             return Unify(qvs1.Sentence, qvs2.Sentence);
                         break;
-                    }*/
+                    }
 
                     break;
 
@@ -408,7 +408,7 @@ namespace FilmsRecommendations
         private Substitution BackChainList(Queue<ISentence> sentences, Substitution substitution)
         {
             Substitution answer = new Substitution();
-            answer.Successful = true;
+            answer.Successful = false;
             if (sentences.Count == 0)
             {
                // substitution.Successful = true;
@@ -427,8 +427,10 @@ namespace FilmsRecommendations
                 var sub = Unify(q, sen);
                 if (sub.Successful)
                 {
+                    answer.Successful = true;
                     substitution.Successful = true;
                     substitution.Compose(sub);
+                    return answer.Compose(BackChainList(sentences, substitution));
                 }
             }
             foreach (var sen in Sentences
@@ -439,10 +441,12 @@ namespace FilmsRecommendations
                 var sub2 = Unify(q, sen.Sentence2);
                 if (sub2.Successful)
                 {
+                answer.Successful = true;
                     var qq = new Queue<ISentence>( SentenceConnectiveSentence.GetAnticedents(sen));
-                    answer.Compose(BackChainList(new Queue<ISentence>(qq.Select(x => x.Substitute(sub2))), substitution.Compose(sub2)));
+                    return answer.Compose(BackChainList(new Queue<ISentence>(qq.Select(x => x.Substitute(sub2))), substitution.Compose(sub2)));
                 }
             }
+            
             return answer.Compose(BackChainList(sentences, substitution));
         }
         #endregion
