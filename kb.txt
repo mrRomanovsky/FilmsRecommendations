@@ -1,44 +1,45 @@
-Vy.(Vx.(((HasOscar(x))^(HasActor(y,x)))->(IsAwesome(y))))
-HasGenre(TITANIC,DRAMA)
-HasActor(TITANIC,DI_CAPRIO)
-HasActor(HARRY_POTTER_AND_THE_SORCERERS_STONE,DANIEL_RADCLIFFE)
-HasActor(LOST_IN_LONDON,DANIEL_RADCLIFFE)
-HasActor(FIGHT_CLUB,EDWARD_NORTON)
-HasActor(FIGHT_CLUB,BRAD_PITT)
-HasActor(THE_REVENANT,DI_CAPRIO)
-HasActor(PIRATES_OF_THE_CARIBBEAN,JOHNNY_DEPP)
-HasActor(THE_GREAT_GATSBY,DI_CAPRIO)
-HasActor(INCEPTION,DI_CAPRIO)
-HasOscar(DI_CAPRIO)
-HasOscar(BRAD_PITT)
-HasCountry(TITANIC,USA)
-HasCountry(FIGHT_CLUB,USA)
-HasCountry(THE_REVENANT,USA)
-HasCountry(INCEPTION,USA)
-HasCountry(HARRY_POTTER_AND_THE_SORCERERS_STONE,GREAT_BRITAN)
-HasCountry(INCEPTION,GREAT_BRITAN)
-HasCountry(THE_GREAT_GATSBY,USA)
-HasCountry(THE_GREAT_GATSBY,AUSTRALIA)
-HasCountry(PIRATES_OF_THE_CARIBBEAN,USA)
-HasGenre(FIGHT_CLUB,ACTION)
-HasGenre(FIGHT_CLUB,DRAMA)
-HasGenre(PIRATES_OF_THE_CARIBBEAN,ACTION)
-HasGenre(PIRATES_OF_THE_CARIBBEAN,COMEDY)
-HasGenre(HARRY_POTTER_AND_THE_SORCERERS_STONE,ACTION)
-HasGenre(HARRY_POTTER_AND_THE_SORCERERS_STONE,FANTASY)
-HasGenre(PIRATES_OF_THE_CARIBBEAN,FANTASY)
-HasGenre(THE_REVENANT,DRAMA)
-HasGenre(THE_GREAT_GATSBY,DRAMA)
-IsAwesome(TITANIC)
-IsAwesome(FIGHT_CLUB)
-IsGood(THE_GREAT_GATSBY)
-IsGood(HARRY_POTTER_AND_THE_SORCERERS_STONE)
-IsCommon(PIRATES_OF_THE_CARIBBEAN)
-IsBad(LOST_IN_LONDON)
-Vy.((HasCountry(y,RUSSIA))->(IsBad(y)))
-Vy.((IsAwesome(y))->(IsGood(y)))
-Vg.(Vx.(((UserLikesGenre(g))^(HasGenre(x,g)))->(UserLikesFilm(x))))
-Va.(Vx.(((UserLikesActor(a))^(HasActor(x,a)))->(UserLikesFilm(x))))
-Vx.(((UserLikesQuality(GOOD))^(IsGood(x)))->(UserLikesFilm(x)))
-Vx.(((UserLikesQuality(BAD))^(IsBad(x)))->(UserLikesFilm(x)))
-Vx.(((UserLikesQuality(AWESOME))^(IsAwesome(x)))->(UserLikesFilm(x)))
+HasActor(TITANIC,DI_CAPRIO) 1
+HasActor(HARRY_POTTER_AND_THE_SORCERERS_STONE,DANIEL_RADCLIFFE) 1
+HasActor(LOST_IN_LONDON,DANIEL_RADCLIFFE) 1
+HasActor(FIGHT_CLUB,EDWARD_NORTON) 1
+HasActor(FIGHT_CLUB,BRAD_PITT) 1
+HasActor(THE_REVENANT,DI_CAPRIO) 1
+HasActor(PIRATES_OF_THE_CARIBBEAN,JOHNNY_DEPP) 1
+HasActor(THE_GREAT_GATSBY,DI_CAPRIO) 1
+HasActor(INCEPTION,DI_CAPRIO) 1
+HasOscar(DI_CAPRIO) 1
+HasOscar(BRAD_PITT) 1
+HasCountry(TITANIC,USA) 1
+HasCountry(FIGHT_CLUB,USA) 1
+HasCountry(THE_REVENANT,USA) 1
+HasCountry(INCEPTION,USA) 1
+HasCountry(HARRY_POTTER_AND_THE_SORCERERS_STONE,GREAT_BRITAN) 1
+HasCountry(INCEPTION,GREAT_BRITAN) 1
+HasCountry(THE_GREAT_GATSBY,USA) 1
+HasCountry(THE_GREAT_GATSBY,AUSTRALIA) 1
+HasCountry(PIRATES_OF_THE_CARIBBEAN,USA) 1
+HasGenre(FIGHT_CLUB,ACTION) 1
+HasGenre(FIGHT_CLUB,DRAMA) 1
+HasGenre(PIRATES_OF_THE_CARIBBEAN,ACTION) 1
+HasGenre(PIRATES_OF_THE_CARIBBEAN,COMEDY) 1
+HasGenre(HARRY_POTTER_AND_THE_SORCERERS_STONE,ACTION) 1
+HasGenre(HARRY_POTTER_AND_THE_SORCERERS_STONE,FANTASY) 1
+HasGenre(PIRATES_OF_THE_CARIBBEAN,FANTASY) 1
+HasGenre(TITANIC,DRAMA) 1
+HasGenre(THE_REVENANT,DRAMA) 1
+HasGenre(THE_GREAT_GATSBY,DRAMA) 1
+IsAwesome(TITANIC) 1
+IsAwesome(FIGHT_CLUB) 1
+IsGood(THE_GREAT_GATSBY) 1
+IsGood(HARRY_POTTER_AND_THE_SORCERERS_STONE) 1
+IsCommon(PIRATES_OF_THE_CARIBBEAN) 1
+IsBad(LOST_IN_LONDON) 1 
+Vy.(Vx.(((HasOscar(x))^(HasActor(y,x)))->(IsAwesome(y)))) 0,9
+Vy.((HasCountry(y,RUSSIA))->(IsBad(y))) 0,7
+Vy.((IsAwesome(y))->(IsGood(y))) 1
+Vg.(Vx.(((UserLikesGenre(g))^(HasGenre(x,g)))->(UserLikesFilm(x)))) 0,8
+Vc.(Vx.(((UserLikesCountry(c))^(HasCountry(x,c)))->(UserLikesFilm(x)))) 0,7
+Va.(Vx.(((UserLikesActor(a))^(HasActor(x,a)))->(UserLikesFilm(x)))) 0,9
+Vx.(((UserLikesQuality(GOOD))^(IsGood(x)))->(UserLikesFilm(x))) 0,8
+Vx.(((UserLikesQuality(BAD))^(IsBad(x)))->(UserLikesFilm(x))) 0,2
+Vx.(((UserLikesQuality(AWESOME))^(IsAwesome(x)))->(UserLikesFilm(x))) 0,99

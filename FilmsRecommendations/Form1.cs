@@ -24,30 +24,92 @@ namespace FilmsRecommendations
 
         private void recommendationsButton_Click(object sender, EventArgs e)
         {
-            var genre = genreTextBox.Text;
-            var quality = qualityTextBox.Text;
+            var genres = genreTextBox.Text.Split(';');
+            var qualities = qualityTextBox.Text.Split(';');
             var actors = actorsTextBox.Text.Split(';');
+            var countries = countryTextBox.Text.Split(';');
             //var kb = new FilmKnowledgeBase("");
             var userSentences = new List<ISentence>();
-            if (genre != "")
-                userSentences.Add(knowledgeBase.ParseSentence("UserLikesGenre("+ genre + ")"));
-            if (quality != "")
-                userSentences.Add(knowledgeBase.ParseSentence("UserLikesQuality(" + quality + ")"));
+            foreach (var genre in genres)
+                if (genre != "")
+                    userSentences.Add(knowledgeBase.ParseSentence("UserLikesGenre("+ genre + ") 1"));
+            foreach (var quality in qualities)
+                if (quality != "")
+                    userSentences.Add(knowledgeBase.ParseSentence("UserLikesQuality(" + quality + ") 1"));
             foreach (var actor in actors)
                 if (actor != "")
-                    userSentences.Add(knowledgeBase.ParseSentence("UserLikesActor(" + actor + ")"));
-
+                    userSentences.Add(knowledgeBase.ParseSentence("UserLikesActor(" + actor + ") 1"));
+            foreach (var country in countries)
+                if (country != "")
+                    userSentences.Add(knowledgeBase.ParseSentence("UserLikesCountry(" + country + ") 1"));
             for (int i = 1; i < userSentences.Count; ++i)
                 knowledgeBase.AddSentence(userSentences[i]);
 
-            knowledgeBase.AddSentence(knowledgeBase.ParseSentence("HasActor(THE_GREAT_GATSBY,DI_CAPRIO)"));
-            knowledgeBase.AddSentence(knowledgeBase.ParseSentence("HasActor(INCEPTION,DI_CAPRIO)"));
-            knowledgeBase.AddSentence(knowledgeBase.ParseSentence("Vy.(Vx.(((HasOscar(x))^(HasActor(y,x)))->(IsAwesome(y))))"));
             FilmKnowledgeBase.ForwardChain(knowledgeBase, userSentences[0]);
 
             foreach (var filmForUser in knowledgeBase.GetFilmsForUser())
-                recommendationsTextBox.Text += filmForUser + "\n";
+                recommendationsTextBox.Text += filmForUser + "\r\n";
             //FilmKnowledgeBase.ForwardChain(kb, kb.ParseSentence("HasOscar(DI_CAPRIO)"));
+        }
+
+        private void filmInfoButton_Click(object sender, EventArgs e)
+        {
+            var filmName = filmNameTextBox.Text;
+            var genres = genreTextBox.Text.Split(';');
+            var qualities = qualityTextBox.Text.Split(';');
+            var actors = actorsTextBox.Text.Split(';');
+            var countries = countryTextBox.Text.Split(';');
+            //var kb = new FilmKnowledgeBase("");
+            var userSentences = new List<ISentence>();
+            foreach (var genre in genres)
+                if (genre != "")
+                {
+                    var terms = filmName + "," + genre;
+                    var userSentence = "HasGenre(" + terms + ") 1";
+                    userSentences.Add(knowledgeBase.ParseSentence(userSentence));
+                }
+            foreach (var quality in qualities)
+                if (quality != "")
+                {
+                    var userSentence = GetQualitySentence(filmName, quality);
+                    userSentences.Add(knowledgeBase.ParseSentence(userSentence));
+                }
+            foreach (var actor in actors)
+                if (actor != "")
+                {
+                    var terms = filmName + "," + actor;
+                    var userSentence = "HasActor(" + terms + ") 1";
+                    userSentences.Add(knowledgeBase.ParseSentence(userSentence));
+                }
+            foreach (var country in countries)
+            {
+                if (country != "")
+                {
+                    var terms = filmName + "," + country;
+                    var userSentence = "HasCountry(" + terms + ") 1";
+                    userSentences.Add(knowledgeBase.ParseSentence(userSentence));
+                }
+            }
+            for (int i = 1; i < userSentences.Count; ++i)
+                knowledgeBase.AddSentence(userSentences[i]);
+
+            FilmKnowledgeBase.ForwardChain(knowledgeBase, userSentences[0]);
+
+            foreach (var filmForUser in knowledgeBase.GetInfoAboutFilm(filmName))
+                recommendationsTextBox.Text += filmForUser + "\r\n";
+        }
+
+        private string GetQualitySentence(string filmName, string Quality)
+        {
+            switch (Quality)
+            {
+                case "AWESOME":
+                    return "IsAwesome(" + filmName + ") 1";
+                case "GOOD":
+                    return "IsGood(" + filmName + ") 1";
+                default:
+                    return "IsBad(" + filmName + ") 1";
+            }
         }
     }
 }

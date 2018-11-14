@@ -16,9 +16,14 @@ namespace FilmsRecommendations
     public class FilmKnowledgeBase
     {
         private string pathToKB;
+        public static Dictionary<ISentence, double> sentenceConfidence;
+        public static double minSentence;
 
         public FilmKnowledgeBase(string pathToKB)
         {
+            sentenceConfidence = new Dictionary<ISentence, double>();
+            minSentence = 1;
+
             this.pathToKB = pathToKB;
             Sentences = new List<ISentence>();
             foreach (var sent in System.IO.File.ReadAllLines(pathToKB))
@@ -27,13 +32,16 @@ namespace FilmsRecommendations
 
         public List<ISentence> Sentences { get; set; } 
 
-        public ISentence ParseSentence(string sentence)
+        public ISentence ParseSentence(string sentence, double coef = -1)
         {
+            var splitedSentence = sentence.Split(' ');
+            if (coef < 0)
+                coef = double.Parse(splitedSentence[1]);
             if (sentence[0] == 'V' || sentence[0] == 'E')
-                return ParseQuantifiedSentence(sentence);
+                return ParseQuantifiedSentence(splitedSentence[0], coef);
             if (sentence[0] == '(')
-                return ParseSentenceConnectiveSentence(sentence);
-            return ParsePredicate(sentence);
+                return ParseSentenceConnectiveSentence(splitedSentence[0], coef);
+            return ParsePredicate(splitedSentence[0], coef);
         }
 
         public void AddSentence(ISentence sentence)
@@ -42,7 +50,7 @@ namespace FilmsRecommendations
         }
 
         #region parsingSentences
-        private ISentence ParseQuantifiedSentence(string sentence)
+        private ISentence ParseQuantifiedSentence(string sentence, double coefficient)
         {
             var quantifiedSentence = new QuantifierVariableSentence();
             if (sentence[0] == 'V')
@@ -53,11 +61,13 @@ namespace FilmsRecommendations
             int closingBracketIdx = sentence.LastIndexOf(')');
             quantifiedSentence.Variable = sentence[1].ToString();
             int innerSentenceStart = openBracketIdx + 1;
-            quantifiedSentence.Sentence = ParseSentence(sentence.Substring(innerSentenceStart, closingBracketIdx - innerSentenceStart));
+            quantifiedSentence.Sentence = ParseSentence(sentence.Substring(innerSentenceStart, closingBracketIdx - innerSentenceStart), coefficient);
+
+            sentenceConfidence[quantifiedSentence] = coefficient;
             return quantifiedSentence;
         }
 
-        private SentenceConnectiveSentence ParseSentenceConnectiveSentence(string sentence)
+        private SentenceConnectiveSentence ParseSentenceConnectiveSentence(string sentence, double coefficient)
         {
             if (sentence[0] != '(')
                 throw new Exception("Trying to parse SentenceConnectiveSentence: '(' expected!");
@@ -76,15 +86,17 @@ namespace FilmsRecommendations
                     break;
             }
 
-            sentenceConnSentence.Sentence1 = ParseSentence(sentence.Substring(1, currPos - 1 - 1));
+            sentenceConnSentence.Sentence1 = ParseSentence(sentence.Substring(1, currPos - 1 - 1), coefficient);
             int connectiveEndIdx = sentence.IndexOf('(', currPos);
             sentenceConnSentence.Connective = sentence.Substring(currPos, connectiveEndIdx - currPos);//sentence[currPos].ToString();
             sentenceConnSentence.Sentence2 =
-                ParseSentence(sentence.Substring(connectiveEndIdx + 1, sentence.Length - (connectiveEndIdx + 1) - 1));
+                ParseSentence(sentence.Substring(connectiveEndIdx + 1, sentence.Length - (connectiveEndIdx + 1) - 1), coefficient);
+
+            sentenceConfidence[sentenceConnSentence] = coefficient;
             return sentenceConnSentence;
         }
 
-        private Predicate ParsePredicate(string sentence)
+        private Predicate ParsePredicate(string sentence, double coefficient)
         {
             var pred = new Predicate();
             int openBracketIdx = sentence.IndexOf('(');
@@ -97,7 +109,7 @@ namespace FilmsRecommendations
             foreach (var argument in sentence.Substring(argsStartIdx, closingBracketIdx - argsStartIdx).Split(','))
                 pred.Terms.Add(new Term(argument));
 
-
+            sentenceConfidence[pred] = coefficient;
             return pred;
         }
         #endregion
@@ -222,12 +234,16 @@ namespace FilmsRecommendations
         #endregion 
 
         #region ForwardChain
-        public static void ForwardChain(FilmKnowledgeBase kb, ISentence sentence)
+        public static void ForwardChain(FilmKnowledgeBase kb, ISentence sentence, double coefficientConfidence = 1)
         {
             foreach (var kbSentence in kb.Sentences)
                 if (IsRenaiming(kbSentence, sentence))
                     return;
+
+
             kb.Sentences.Add(sentence);
+            sentenceConfidence[sentence] = coefficientConfidence;
+
             int sentIdx = 0;
             while (sentIdx < kb.Sentences.Count)
             {
@@ -244,7 +260,7 @@ namespace FilmsRecommendations
                             var unificationResult = Unify(anticedents[i], sentence);
                             if (unificationResult.Successful)
                                 FindAndInfer(kb, anticedents.Take(i).Concat(anticedents.Skip(i + 1)).ToList(), //dropping unified sentence
-                                    sentenceConnectiveSentence.Sentence2, unificationResult);
+                                    sentenceConnectiveSentence.Sentence2, unificationResult, 1, sentenceConfidence[sentenceConnectiveSentence]);
                         }
                     }
                 }
@@ -252,24 +268,60 @@ namespace FilmsRecommendations
             }
         }
 
+        //public List<string> GetFilmsForUser()
+        //{
+        //    var filmsForUser = new List<string>();
+        //    foreach (var sentence in Sentences)
+        //        if (sentence.GetSentenceType() == SentenceType.Predicate)
+        //        {
+        //            var pred = sentence as Predicate;
+        //            if (pred.PredicateName == "UserLikesFilm")
+        //                filmsForUser.Add(pred.Terms[0].Value);
+        //        }
+        //    return filmsForUser;
+        //}
+
         public List<string> GetFilmsForUser()
         {
             var filmsForUser = new List<string>();
-            foreach (var sentence in Sentences)
-                if (sentence.GetSentenceType() == SentenceType.Predicate)
-                {
-                    var pred = sentence as Predicate;
-                    if (pred.PredicateName == "UserLikesFilm")
-                        filmsForUser.Add(pred.Terms[0].Value);
-                }
+            var selectedFilms = sentenceConfidence.Where(x => x.Key.GetSentenceType() == SentenceType.Predicate).ToList();
+            selectedFilms = selectedFilms.Where(x => (x.Key as Predicate).PredicateName == "UserLikesFilm").ToList();
+            selectedFilms.Sort((p1, p2) => p2.Value.CompareTo(p1.Value));
+
+            foreach(var s in selectedFilms)
+            {
+                if ((s.Key as Predicate).Terms.Any(t => !t.IsConstant))
+                    continue;
+                else
+                    filmsForUser.Add((s.Key as Predicate).Terms[0].Value + " " + s.Value);
+            }
             return filmsForUser;
         }
 
-        public static void FindAndInfer(FilmKnowledgeBase kb, List<ISentence> premises, ISentence conclusion, Substitution s)
+        public List<string> GetInfoAboutFilm(string film)
+        {
+            var filmInfo = new List<string>();
+            var selectedFilms = sentenceConfidence.Where(x => x.Key.GetSentenceType() == SentenceType.Predicate).ToList();
+            selectedFilms = selectedFilms.Where(x => (x.Key as Predicate).Terms.Any(t => t.Value == film)).ToList();
+            selectedFilms.Sort((p1, p2) => p2.Value.CompareTo(p1.Value));
+
+            foreach (var s in selectedFilms)
+            {
+                var pred = s.Key as Predicate;
+                if (pred.Terms.Any(t => !t.IsConstant))
+                    continue;
+                else
+                    filmInfo.Add(pred.PredicateName + "(" + String.Join(", ", pred.Terms.Select(t => t.Value).ToArray()) + ") " + s.Value);//", ".Join(pred.Terms[0].Value + " " + s.Value);
+            }
+            return filmInfo;
+        }
+
+
+        public static void FindAndInfer(FilmKnowledgeBase kb, List<ISentence> premises, ISentence conclusion, Substitution s, double minPremiseConf, double ruleFC)
         {
             if (premises.Count == 0)
             {
-                ForwardChain(kb, conclusion.Substitute(s));
+                ForwardChain(kb, conclusion.Substitute(s), minPremiseConf * ruleFC);
                 return;
             }
             int sentIdx = 0;
@@ -279,7 +331,10 @@ namespace FilmsRecommendations
                 var unifyResult = Unify(kbSentence, premises.First().Substitute(s));
                 if (unifyResult.Successful)
                 {
-                    FindAndInfer(kb, premises.Skip(1).ToList(), conclusion, s.Compose(unifyResult));
+                    var premise = kbSentence;
+                    var currentPremiseConf = sentenceConfidence[premise];
+                    var minConf = Math.Min(currentPremiseConf, minPremiseConf);
+                    FindAndInfer(kb, premises.Skip(1).ToList(), conclusion, s.Compose(unifyResult), minConf, ruleFC);
                 }
                 ++sentIdx;
             }
