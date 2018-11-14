@@ -210,7 +210,7 @@ namespace FilmsRecommendations
                     if (sentence1.GetSentenceType() != sentence2.GetSentenceType())
                         break;
                     var scs1 = sentence1 as SentenceConnectiveSentence;
-                    var scs2 = sentence1 as SentenceConnectiveSentence;
+                    var scs2 = sentence2 as SentenceConnectiveSentence;
                     if (scs1.Connective != scs2.Connective)
                         break;
                     return Unify(scs1.Sentence1, scs2.Sentence1).Compose(Unify(scs1.Sentence2, scs2.Sentence2));
@@ -401,28 +401,42 @@ namespace FilmsRecommendations
         #endregion
 
         #region BackwardChain
-        public Substitution BackwardChain(ISentence sentence)
+        public Substitution BackwardChain(ISentence sentence, ref List<Tuple<string, List<string>>> listInference)
         {
+            listInference = new List<Tuple<string, List<string>>>();
             var q = new Queue<ISentence>();
             q.Enqueue(sentence);
-            return BackChainList(q, new Substitution());
+            return BackChainList(q, new Substitution(), listInference);
         }
 
-        private Substitution BackChainList(Queue<ISentence> sentences, Substitution substitution)
+        private Substitution BackChainList(Queue<ISentence> sentences, Substitution substitution, List<Tuple<string, List<string>>> listInference)
         {
             Substitution answer = new Substitution();
             answer.Successful = false;
             if (sentences.Count == 0)
             {
-               // substitution.Successful = true;
                 return substitution;
             }
             var q = sentences.Dequeue();
+            Tuple<string, List<string>> inferenceItem = new Tuple<string, List<string>>(q.ToString(), new List<string>());
+            
+
             while (q.GetSentenceType() == SentenceType.SentenceConnectiveSentence && (q as SentenceConnectiveSentence).Connective == "^")
             {
-                sentences.Enqueue((q as SentenceConnectiveSentence).Sentence1);
-                sentences.Enqueue((q as SentenceConnectiveSentence).Sentence2);
+                var sen1 = (q as SentenceConnectiveSentence).Sentence1;
+                var sen2 = (q as SentenceConnectiveSentence).Sentence2;
+
+                sentences.Enqueue(sen1);
+                sentences.Enqueue(sen2);
+                inferenceItem.Item2.Add(sen1.ToString());
+                inferenceItem.Item2.Add(sen2.ToString());
                 q = sentences.Dequeue();
+            }
+
+            if (inferenceItem.Item2.Count() != 0)
+            {
+                listInference.Add(inferenceItem);
+                inferenceItem = new Tuple<string, List<string>>(q.ToString(), new List<string>());
             }
 
             foreach (var sen in Sentences)
@@ -433,8 +447,22 @@ namespace FilmsRecommendations
                     answer.Successful = true;
                     substitution.Successful = true;
                     substitution.Compose(sub);
-                    return answer.Compose(BackChainList(sentences, substitution));
+                    answer = answer.Compose(BackChainList(sentences, substitution, listInference));
+                    //if (answer.Successful)
+                    //{
+                        inferenceItem.Item2.Add(sen.ToString());
+                        listInference.Add(inferenceItem);
+                   // }
+                    return answer;
                 }
+            }
+            if (q.GetSentenceType() == SentenceType.SentenceConnectiveSentence && (q as SentenceConnectiveSentence).Connective == "->")
+            {
+                var sen1 = (q as SentenceConnectiveSentence).Sentence1;
+
+                sentences.Enqueue(sen1);
+                inferenceItem.Item2.Add(sen1.ToString());
+                return BackChainList(sentences, substitution, listInference);
             }
             foreach (var sen in Sentences
                 .Select(s => DropOuterQuantifiers(s))
@@ -444,13 +472,24 @@ namespace FilmsRecommendations
                 var sub2 = Unify(q, sen.Sentence2);
                 if (sub2.Successful)
                 {
-                answer.Successful = true;
+                    answer.Successful = true;
                     var qq = new Queue<ISentence>( SentenceConnectiveSentence.GetAnticedents(sen));
-                    return answer.Compose(BackChainList(new Queue<ISentence>(qq.Select(x => x.Substitute(sub2))), substitution.Compose(sub2)));
+                    answer = answer.Compose(BackChainList(new Queue<ISentence>(
+                        qq.Select(x => x.Substitute(sub2))),
+                        substitution.Compose(sub2), listInference));
+                    if (answer.Successful)
+                    {
+                        inferenceItem.Item2.Add(sen.ToString());
+                        listInference.Add(inferenceItem);
+                        substitution.Successful = true;
+                    }
+                    return answer
+                    .Compose(BackChainList(sentences, substitution, listInference));
                 }
             }
-            
-            return answer.Compose(BackChainList(sentences, substitution));
+            inferenceItem.Item2.Add("Нет вывода");
+            listInference.Add(inferenceItem);
+            return answer.Compose(BackChainList(sentences, substitution, listInference));
         }
         #endregion
     }

@@ -54,7 +54,7 @@ namespace FilmsRecommendations
             if (listBoxAnswerType.SelectedItem == null)
             {
                 //распознать 
-               sentence = knowledgeBase.ParseSentence(textBoxAnwerAsString.Text);
+                sentence = knowledgeBase.ParseSentence(textBoxAnwerAsString.Text);
             }
             else
             {
@@ -66,9 +66,24 @@ namespace FilmsRecommendations
                 else
                     sentence = new SentenceConnectiveSentence(sentence, s, "^");
             }
-            var answer = knowledgeBase.BackwardChain(sentence);
+            var listInfersece = new List<Tuple<string, List<string>>>();
+            var answer = knowledgeBase.BackwardChain(sentence,ref listInfersece);
+            var infer = BuiildInferce(listInfersece);
             var m = MessageBox.Show(sentence.ToString() + "\n Ответ : " + answer.Successful.ToString(), answer.Successful ? "True" : "False", MessageBoxButtons.OK);
+            var m1 = MessageBox.Show("Вывод: \n" + infer, "Вывод", MessageBoxButtons.OK);
+
             sentence = null;
+        }
+
+        private string BuiildInferce(List<Tuple<string, List<string>>>  listInferce)
+        {
+            string res = "";
+            res = string.Join("\n-----------------------------------\n", listInferce.Select(item => item.Item1 + "<=" + string.Join(",", item.Item2)));
+            foreach (var item in listInferce)
+            {
+
+            }
+            return res;
         }
 
         private ISentence ReadSentenceFromPanel()
