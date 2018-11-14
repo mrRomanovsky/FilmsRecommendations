@@ -290,12 +290,30 @@ namespace FilmsRecommendations
 
             foreach(var s in selectedFilms)
             {
-                if ((s.Key as Predicate).Terms[0].Value == "x")
+                if ((s.Key as Predicate).Terms.Any(t => !t.IsConstant))
                     continue;
                 else
                     filmsForUser.Add((s.Key as Predicate).Terms[0].Value + " " + s.Value);
             }
             return filmsForUser;
+        }
+
+        public List<string> GetInfoAboutFilm(string film)
+        {
+            var filmInfo = new List<string>();
+            var selectedFilms = sentenceConfidence.Where(x => x.Key.GetSentenceType() == SentenceType.Predicate).ToList();
+            selectedFilms = selectedFilms.Where(x => (x.Key as Predicate).Terms.Any(t => t.Value == film)).ToList();
+            selectedFilms.Sort((p1, p2) => p2.Value.CompareTo(p1.Value));
+
+            foreach (var s in selectedFilms)
+            {
+                var pred = s.Key as Predicate;
+                if (pred.Terms.Any(t => !t.IsConstant))
+                    continue;
+                else
+                    filmInfo.Add(pred.PredicateName + "(" + String.Join(", ", pred.Terms.Select(t => t.Value).ToArray()) + ") " + s.Value);//", ".Join(pred.Terms[0].Value + " " + s.Value);
+            }
+            return filmInfo;
         }
 
 

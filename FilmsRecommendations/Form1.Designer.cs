@@ -41,6 +41,10 @@
             this.printPreviewDialog1 = new System.Windows.Forms.PrintPreviewDialog();
             this.label1 = new System.Windows.Forms.Label();
             this.qualityTextBox = new System.Windows.Forms.TextBox();
+            this.filmInfoButton = new System.Windows.Forms.Button();
+            this.filmNameTextBox = new System.Windows.Forms.TextBox();
+            this.label2 = new System.Windows.Forms.Label();
+            this.whyButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // genreLabel
@@ -73,7 +77,7 @@
             // recommendationsLabel
             // 
             this.recommendationsLabel.AutoSize = true;
-            this.recommendationsLabel.Location = new System.Drawing.Point(403, 206);
+            this.recommendationsLabel.Location = new System.Drawing.Point(427, 40);
             this.recommendationsLabel.Name = "recommendationsLabel";
             this.recommendationsLabel.Size = new System.Drawing.Size(82, 13);
             this.recommendationsLabel.TabIndex = 3;
@@ -81,21 +85,21 @@
             // 
             // genreTextBox
             // 
-            this.genreTextBox.Location = new System.Drawing.Point(106, 70);
+            this.genreTextBox.Location = new System.Drawing.Point(209, 77);
             this.genreTextBox.Name = "genreTextBox";
             this.genreTextBox.Size = new System.Drawing.Size(100, 20);
             this.genreTextBox.TabIndex = 4;
             // 
             // countryTextBox
             // 
-            this.countryTextBox.Location = new System.Drawing.Point(106, 161);
+            this.countryTextBox.Location = new System.Drawing.Point(209, 161);
             this.countryTextBox.Name = "countryTextBox";
             this.countryTextBox.Size = new System.Drawing.Size(100, 20);
             this.countryTextBox.TabIndex = 5;
             // 
             // actorsTextBox
             // 
-            this.actorsTextBox.Location = new System.Drawing.Point(106, 245);
+            this.actorsTextBox.Location = new System.Drawing.Point(209, 245);
             this.actorsTextBox.Name = "actorsTextBox";
             this.actorsTextBox.Size = new System.Drawing.Size(100, 20);
             this.actorsTextBox.TabIndex = 6;
@@ -112,9 +116,9 @@
             // 
             this.recommendationsButton.Location = new System.Drawing.Point(69, 373);
             this.recommendationsButton.Name = "recommendationsButton";
-            this.recommendationsButton.Size = new System.Drawing.Size(172, 23);
+            this.recommendationsButton.Size = new System.Drawing.Size(172, 46);
             this.recommendationsButton.TabIndex = 8;
-            this.recommendationsButton.Text = "Получить рекомендации";
+            this.recommendationsButton.Text = "Получить рекомендации для зрителя";
             this.recommendationsButton.UseVisualStyleBackColor = true;
             this.recommendationsButton.Click += new System.EventHandler(this.recommendationsButton_Click);
             // 
@@ -139,16 +143,55 @@
             // 
             // qualityTextBox
             // 
-            this.qualityTextBox.Location = new System.Drawing.Point(106, 327);
+            this.qualityTextBox.Location = new System.Drawing.Point(218, 327);
             this.qualityTextBox.Name = "qualityTextBox";
             this.qualityTextBox.Size = new System.Drawing.Size(100, 20);
             this.qualityTextBox.TabIndex = 10;
+            // 
+            // filmInfoButton
+            // 
+            this.filmInfoButton.Location = new System.Drawing.Point(366, 373);
+            this.filmInfoButton.Name = "filmInfoButton";
+            this.filmInfoButton.Size = new System.Drawing.Size(172, 46);
+            this.filmInfoButton.TabIndex = 11;
+            this.filmInfoButton.Text = "Получить информацию о фильме";
+            this.filmInfoButton.UseVisualStyleBackColor = true;
+            this.filmInfoButton.Click += new System.EventHandler(this.filmInfoButton_Click);
+            // 
+            // filmNameTextBox
+            // 
+            this.filmNameTextBox.Location = new System.Drawing.Point(409, 334);
+            this.filmNameTextBox.Name = "filmNameTextBox";
+            this.filmNameTextBox.Size = new System.Drawing.Size(100, 20);
+            this.filmNameTextBox.TabIndex = 12;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(409, 298);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(100, 13);
+            this.label2.TabIndex = 13;
+            this.label2.Text = "Название фильма";
+            // 
+            // whyButton
+            // 
+            this.whyButton.Location = new System.Drawing.Point(430, 180);
+            this.whyButton.Name = "whyButton";
+            this.whyButton.Size = new System.Drawing.Size(75, 23);
+            this.whyButton.TabIndex = 14;
+            this.whyButton.Text = "Почему?";
+            this.whyButton.UseVisualStyleBackColor = true;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.whyButton);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.filmNameTextBox);
+            this.Controls.Add(this.filmInfoButton);
             this.Controls.Add(this.qualityTextBox);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.recommendationsButton);
@@ -181,6 +224,10 @@
         private System.Windows.Forms.PrintPreviewDialog printPreviewDialog1;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox qualityTextBox;
+        private System.Windows.Forms.Button filmInfoButton;
+        private System.Windows.Forms.TextBox filmNameTextBox;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Button whyButton;
     }
 }
 
