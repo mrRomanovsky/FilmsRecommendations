@@ -17,11 +17,14 @@ namespace FilmsRecommendations
     {
         private string pathToKB;
         public static Dictionary<ISentence, double> sentenceConfidence;
+        //public static Dictionary<ISentence, Tuple<List<ISentence>, ISentence>> inferenceChain;
+        public static Dictionary<ISentence, string> proofs = new Dictionary<ISentence, string>();
         public static double minSentence;
 
         public FilmKnowledgeBase(string pathToKB)
         {
             sentenceConfidence = new Dictionary<ISentence, double>();
+            //inferenceChain = new Dictionary<ISentence, Tuple<List<ISentence>, ISentence>>();
             minSentence = 1;
 
             this.pathToKB = pathToKB;
@@ -234,13 +237,15 @@ namespace FilmsRecommendations
         #endregion 
 
         #region ForwardChain
-        public static void ForwardChain(FilmKnowledgeBase kb, ISentence sentence, double coefficientConfidence = 1)
+        public static void ForwardChain(FilmKnowledgeBase kb, ISentence sentence, double coefficientConfidence = 1, string prove = "")
         {
             foreach (var kbSentence in kb.Sentences)
                 if (IsRenaiming(kbSentence, sentence))
                     return;
 
-
+            if (prove == "")
+                prove = "proven " + sentence.ToString();
+            proofs[sentence] = prove;
             kb.Sentences.Add(sentence);
             sentenceConfidence[sentence] = coefficientConfidence;
 
@@ -259,8 +264,13 @@ namespace FilmsRecommendations
                         {
                             var unificationResult = Unify(anticedents[i], sentence);
                             if (unificationResult.Successful)
+                            {
                                 FindAndInfer(kb, anticedents.Take(i).Concat(anticedents.Skip(i + 1)).ToList(), //dropping unified sentence
-                                    sentenceConnectiveSentence.Sentence2, unificationResult, 1, sentenceConfidence[sentenceConnectiveSentence]);
+    sentenceConnectiveSentence.Sentence2, unificationResult, 1, sentenceConfidence[sentenceConnectiveSentence], prove);
+                                //inferenceChain[sentenceConnectiveSentence.Sente2] = new Tuple<List<ISentence>, ISentence>(new List<ISentence>(), );
+                                //inferenceChain[]
+                            }
+
                         }
                     }
                 }
@@ -268,60 +278,15 @@ namespace FilmsRecommendations
             }
         }
 
-        //public List<string> GetFilmsForUser()
-        //{
-        //    var filmsForUser = new List<string>();
-        //    foreach (var sentence in Sentences)
-        //        if (sentence.GetSentenceType() == SentenceType.Predicate)
-        //        {
-        //            var pred = sentence as Predicate;
-        //            if (pred.PredicateName == "UserLikesFilm")
-        //                filmsForUser.Add(pred.Terms[0].Value);
-        //        }
-        //    return filmsForUser;
-        //}
-
-        public List<string> GetFilmsForUser()
-        {
-            var filmsForUser = new List<string>();
-            var selectedFilms = sentenceConfidence.Where(x => x.Key.GetSentenceType() == SentenceType.Predicate).ToList();
-            selectedFilms = selectedFilms.Where(x => (x.Key as Predicate).PredicateName == "UserLikesFilm").ToList();
-            selectedFilms.Sort((p1, p2) => p2.Value.CompareTo(p1.Value));
-
-            foreach(var s in selectedFilms)
-            {
-                if ((s.Key as Predicate).Terms.Any(t => !t.IsConstant))
-                    continue;
-                else
-                    filmsForUser.Add((s.Key as Predicate).Terms[0].Value + " " + s.Value);
-            }
-            return filmsForUser;
-        }
-
-        public List<string> GetInfoAboutFilm(string film)
-        {
-            var filmInfo = new List<string>();
-            var selectedFilms = sentenceConfidence.Where(x => x.Key.GetSentenceType() == SentenceType.Predicate).ToList();
-            selectedFilms = selectedFilms.Where(x => (x.Key as Predicate).Terms.Any(t => t.Value == film)).ToList();
-            selectedFilms.Sort((p1, p2) => p2.Value.CompareTo(p1.Value));
-
-            foreach (var s in selectedFilms)
-            {
-                var pred = s.Key as Predicate;
-                if (pred.Terms.Any(t => !t.IsConstant))
-                    continue;
-                else
-                    filmInfo.Add(pred.PredicateName + "(" + String.Join(", ", pred.Terms.Select(t => t.Value).ToArray()) + ") " + s.Value);//", ".Join(pred.Terms[0].Value + " " + s.Value);
-            }
-            return filmInfo;
-        }
-
-
-        public static void FindAndInfer(FilmKnowledgeBase kb, List<ISentence> premises, ISentence conclusion, Substitution s, double minPremiseConf, double ruleFC)
+        public static void FindAndInfer(FilmKnowledgeBase kb, List<ISentence> premises, ISentence conclusion, Substitution s, double minPremiseConf, double ruleFC, string prove = "")
         {
             if (premises.Count == 0)
             {
-                ForwardChain(kb, conclusion.Substitute(s), minPremiseConf * ruleFC);
+                //словарик: <Isentence -> <List<Isentences>(посылки), ISentence(правило)>
+                //добавить в словарик правило и все доказанные (с подстановками) посылки
+                //при восстановлении будем проходить по всем посылкам и рекурсивно выписывать всё для них
+                prove = prove + " | proven " + conclusion.Substitute(s).ToString();
+                ForwardChain(kb, conclusion.Substitute(s), minPremiseConf * ruleFC, prove);
                 return;
             }
             int sentIdx = 0;
@@ -334,10 +299,73 @@ namespace FilmsRecommendations
                     var premise = kbSentence;
                     var currentPremiseConf = sentenceConfidence[premise];
                     var minConf = Math.Min(currentPremiseConf, minPremiseConf);
-                    FindAndInfer(kb, premises.Skip(1).ToList(), conclusion, s.Compose(unifyResult), minConf, ruleFC);
+                    //inferenceChain[conclusion].Item1.Add(premises.First().Substitute(s));
+                    prove = prove + " | proven anticedent: " + kbSentence.Substitute(unifyResult).ToString();
+                    FindAndInfer(kb, premises.Skip(1).ToList(), conclusion, s.Compose(unifyResult), minConf, ruleFC, prove);
                 }
                 ++sentIdx;
             }
+        }
+
+        /*public void FixInferenceChain()
+        {
+            foreach (var chains in inferenceChain)
+                foreach (var chains2 in inferenceChain)
+                    if (Unify(chains.Key, chains2.Key).Successful)
+                    {
+                        if (chains.Value.Item1.Count < chains2.Value.Item1.Count)
+                        {
+                            inferenceChain[chains.Key] = new Tuple<List<ISentence>, ISentence>(chains2.Value.Item1, chains2.Value.Item2);
+                            //chains.Value.Item1.AddRange(chains2.Value.Item1);
+                            
+                            //chains.Value.Item2 = chains2.Value.Item2
+                        }
+                        else
+                            inferenceChain[chains2.Key] = new Tuple<List<ISentence>, ISentence>(chains.Value.Item1, chains.Value.Item2);
+                        //chains2.Value.Item1.AddRange(chains.Value.Item1);
+                    }
+
+        }*/
+
+        public Tuple<List<string>, List<ISentence>> GetFilmsForUser()
+        {
+            var filmsForUser = new Tuple<List<string>, List<ISentence>>(new List<string>(), new List<ISentence>());
+            var selectedFilms = sentenceConfidence.Where(x => x.Key.GetSentenceType() == SentenceType.Predicate).ToList();
+            selectedFilms = selectedFilms.Where(x => (x.Key as Predicate).PredicateName == "UserLikesFilm").ToList();
+            selectedFilms.Sort((p1, p2) => p2.Value.CompareTo(p1.Value));
+
+            foreach(var s in selectedFilms)
+            {
+                if ((s.Key as Predicate).Terms.Any(t => !t.IsConstant))
+                    continue;
+                else
+                {
+                    filmsForUser.Item1.Add((s.Key as Predicate).Terms[0].Value + " " + s.Value);
+                    filmsForUser.Item2.Add((s.Key as Predicate));
+                }
+            }
+            return filmsForUser;
+        }
+
+        public Tuple<List<string>, List<ISentence>> GetInfoAboutFilm(string film)
+        {
+            var filmInfo = new Tuple<List<string>, List<ISentence>>(new List<string>(), new List<ISentence>());
+            var selectedFilms = sentenceConfidence.Where(x => x.Key.GetSentenceType() == SentenceType.Predicate).ToList();
+            selectedFilms = selectedFilms.Where(x => (x.Key as Predicate).Terms.Any(t => t.Value == film)).ToList();
+            selectedFilms.Sort((p1, p2) => p2.Value.CompareTo(p1.Value));
+
+            foreach (var s in selectedFilms)
+            {
+                var pred = s.Key as Predicate;
+                if (pred.Terms.Any(t => !t.IsConstant))
+                    continue;
+                else
+                {
+                    filmInfo.Item1.Add(pred.PredicateName + "(" + String.Join(", ", pred.Terms.Select(t => t.Value).ToArray()) + ") " + s.Value);//", ".Join(pred.Terms[0].Value + " " + s.Value);
+                    filmInfo.Item2.Add(s.Key as Predicate);
+                }
+            }
+            return filmInfo;
         }
 
         public static ISentence DropOuterQuantifiers(ISentence sentence)

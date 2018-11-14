@@ -182,6 +182,7 @@
             this.whyButton.TabIndex = 14;
             this.whyButton.Text = "Почему?";
             this.whyButton.UseVisualStyleBackColor = true;
+            this.whyButton.Click += new System.EventHandler(this.whyButton_Click);
             // 
             // Form1
             // 
