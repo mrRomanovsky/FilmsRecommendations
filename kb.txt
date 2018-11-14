@@ -73,3 +73,4 @@ Vy.((HasGenre(y,ACTION))->(HasActor(y,BRAD_PITT))) 0,43
 Vy.((HasCountry(y,RUSSIA))->(HasActor(y,SEREBRYAKOV))) 0,52
 Vg.(Vx.(((UserLikesGenre(g))^(HasGenre(x,g)))->(UserLikesFilm(x)))) 0,84
 Vx.(((UserLikesQuality(GOOD))^(IsGood(x)))->(UserLikesFilm(x))) 0,81
+Vx.(((UserLikesQuality(COMMON))^(IsCommon(x)))->(UserLikesFilm(x))) 0,81

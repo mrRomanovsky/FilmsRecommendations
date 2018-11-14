@@ -114,6 +114,8 @@ namespace FilmsRecommendations
                     return "IsAwesome(" + filmName + ") 1";
                 case "GOOD":
                     return "IsGood(" + filmName + ") 1";
+                case "COMMON":
+                    return "IsCommon(" + filmName + ") 1";
                 default:
                     return "IsBad(" + filmName + ") 1";
             }
@@ -121,8 +123,22 @@ namespace FilmsRecommendations
 
         private void whyButton_Click(object sender, EventArgs e)
         {
-            var explanation = answers.Select(sentence => FilmKnowledgeBase.proofs[sentence]).ToArray();
-            System.IO.File.WriteAllLines("explanation.txt", explanation);
+            var explanationsList = new List<string>();
+            for (int i = 0; i < answers.Count; ++i)
+                explanationsList.Add(DropExtraSentences(FilmKnowledgeBase.proofs[answers[i]], i));
+            //var explanation = answers.Select(sentence => FilmKnowledgeBase.proofs[sentence]).ToArray();
+            System.IO.File.WriteAllLines("explanation.txt", explanationsList);
+        }
+
+        private string DropExtraSentences(string info, int toDrop)
+        {
+            List<char> res = info.SkipWhile(c => c != '|').Skip(1).ToList();
+            for (int i = 0; i < toDrop; ++i)
+                res = res.SkipWhile(c => c != '|').Skip(1).ToList();
+            var newRes = new char[res.Count];
+            for (int i = 0; i < res.Count; ++i)
+                newRes[i] = res[i];
+            return new string(newRes);
         }
     }
 }

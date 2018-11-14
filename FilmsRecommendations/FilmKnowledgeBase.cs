@@ -245,6 +245,7 @@ namespace FilmsRecommendations
 
             if (prove == "")
                 prove = "proven " + sentence.ToString();
+            System.IO.File.AppendAllText("explanationPath.txt", "proven: " + sentence + ":\n)");
             proofs[sentence] = prove;
             kb.Sentences.Add(sentence);
             sentenceConfidence[sentence] = coefficientConfidence;
@@ -266,7 +267,7 @@ namespace FilmsRecommendations
                             if (unificationResult.Successful)
                             {
                                 FindAndInfer(kb, anticedents.Take(i).Concat(anticedents.Skip(i + 1)).ToList(), //dropping unified sentence
-    sentenceConnectiveSentence.Sentence2, unificationResult, 1, sentenceConfidence[sentenceConnectiveSentence], prove);
+    sentenceConnectiveSentence.Sentence2, unificationResult, 1, sentenceConfidence[sentenceConnectiveSentence]);
                                 //inferenceChain[sentenceConnectiveSentence.Sente2] = new Tuple<List<ISentence>, ISentence>(new List<ISentence>(), );
                                 //inferenceChain[]
                             }
@@ -280,6 +281,8 @@ namespace FilmsRecommendations
 
         public static void FindAndInfer(FilmKnowledgeBase kb, List<ISentence> premises, ISentence conclusion, Substitution s, double minPremiseConf, double ruleFC, string prove = "")
         {
+            System.IO.File.AppendAllText("explanationPath.txt", "##########################\n\n\n");
+            System.IO.File.AppendAllText("explanationPath.txt", "Trying to prove: " + conclusion.Substitute(s).ToString() + ":\n)");
             if (premises.Count == 0)
             {
                 //словарик: <Isentence -> <List<Isentences>(посылки), ISentence(правило)>
