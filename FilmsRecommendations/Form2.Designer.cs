@@ -36,7 +36,7 @@
             this.labelJanre = new System.Windows.Forms.Label();
             this.labelCountry = new System.Windows.Forms.Label();
             this.textBoxActor = new System.Windows.Forms.TextBox();
-            this.textBoxJanre = new System.Windows.Forms.TextBox();
+            this.textBoxGenre = new System.Windows.Forms.TextBox();
             this.textBoxFilm = new System.Windows.Forms.TextBox();
             this.textBoxCountry = new System.Windows.Forms.TextBox();
             this.buttonGetAnswer = new System.Windows.Forms.Button();
@@ -128,10 +128,10 @@
             // 
             // textBoxJanre
             // 
-            this.textBoxJanre.Location = new System.Drawing.Point(464, 117);
-            this.textBoxJanre.Name = "textBoxJanre";
-            this.textBoxJanre.Size = new System.Drawing.Size(100, 20);
-            this.textBoxJanre.TabIndex = 9;
+            this.textBoxGenre.Location = new System.Drawing.Point(464, 117);
+            this.textBoxGenre.Name = "textBoxJanre";
+            this.textBoxGenre.Size = new System.Drawing.Size(100, 20);
+            this.textBoxGenre.TabIndex = 9;
             // 
             // textBoxFilm
             // 
@@ -209,7 +209,7 @@
             this.Controls.Add(this.buttonGetAnswer);
             this.Controls.Add(this.textBoxCountry);
             this.Controls.Add(this.textBoxFilm);
-            this.Controls.Add(this.textBoxJanre);
+            this.Controls.Add(this.textBoxGenre);
             this.Controls.Add(this.textBoxActor);
             this.Controls.Add(this.labelCountry);
             this.Controls.Add(this.labelJanre);
@@ -235,7 +235,7 @@
         private System.Windows.Forms.Label labelJanre;
         private System.Windows.Forms.Label labelCountry;
         private System.Windows.Forms.TextBox textBoxActor;
-        private System.Windows.Forms.TextBox textBoxJanre;
+        private System.Windows.Forms.TextBox textBoxGenre;
         private System.Windows.Forms.TextBox textBoxFilm;
         private System.Windows.Forms.TextBox textBoxCountry;
         private System.Windows.Forms.Button buttonGetAnswer;
