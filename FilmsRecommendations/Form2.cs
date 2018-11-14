@@ -80,7 +80,7 @@ namespace FilmsRecommendations
                     case 1:
                         return new Predicate("HasOscar", new List<Term> { new Term(textBoxActor.Text) });
                     case 2:
-                        return new Predicate("HasJanre", new List<Term> { new Term(textBoxFilm.Text), new Term(textBoxJanre.Text) });
+                        return new Predicate("HasGenre", new List<Term> { new Term(textBoxFilm.Text), new Term(textBoxGenre.Text) });
                     case 3:
                         return new Predicate("HasCountry", new List<Term> { new Term(textBoxFilm.Text), new Term(textBoxCountry.Text) });
                     case 4:

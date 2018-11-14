@@ -22,6 +22,8 @@ namespace FilmsRecommendations
             //pathToKB = path;
         }
 
+        private List<ISentence> answers = new List<ISentence>();
+
         private void recommendationsButton_Click(object sender, EventArgs e)
         {
             var genres = genreTextBox.Text.Split(';');
@@ -47,7 +49,9 @@ namespace FilmsRecommendations
 
             FilmKnowledgeBase.ForwardChain(knowledgeBase, userSentences[0]);
 
-            foreach (var filmForUser in knowledgeBase.GetFilmsForUser())
+            var res = knowledgeBase.GetFilmsForUser();
+            answers = res.Item2;
+            foreach (var filmForUser in res.Item1)
                 recommendationsTextBox.Text += filmForUser + "\r\n";
             //FilmKnowledgeBase.ForwardChain(kb, kb.ParseSentence("HasOscar(DI_CAPRIO)"));
         }
@@ -95,7 +99,10 @@ namespace FilmsRecommendations
 
             FilmKnowledgeBase.ForwardChain(knowledgeBase, userSentences[0]);
 
-            foreach (var filmForUser in knowledgeBase.GetInfoAboutFilm(filmName))
+            var res = knowledgeBase.GetFilmsForUser();
+            answers = res.Item2;
+
+            foreach (var filmForUser in res.Item1)
                 recommendationsTextBox.Text += filmForUser + "\r\n";
         }
 
@@ -110,6 +117,12 @@ namespace FilmsRecommendations
                 default:
                     return "IsBad(" + filmName + ") 1";
             }
+        }
+
+        private void whyButton_Click(object sender, EventArgs e)
+        {
+            var explanation = answers.Select(sentence => FilmKnowledgeBase.proofs[sentence]).ToArray();
+            System.IO.File.WriteAllLines("explanation.txt", explanation);
         }
     }
 }
